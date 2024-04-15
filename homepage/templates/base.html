@@ -1,0 +1,13 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Blog Home Page</title>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+        <script src="{% static 'js/index.js' %}"></script>
+    </head>
+    <body>
+        {% block content %} {% endblock %}
+    </body>
+</html>
