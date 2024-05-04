@@ -58,7 +58,9 @@ ROOT_URLCONF = "blog.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+        
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -70,7 +72,8 @@ TEMPLATES = [
         },
     },
 ]
-
+# django_project/settings.py
+LOGIN_REDIRECT_URL = "/"  # new
 WSGI_APPLICATION = "blog.wsgi.application"
 
 
