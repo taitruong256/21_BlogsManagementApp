@@ -23,9 +23,7 @@ from register import views as register
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # path("accounts/", include("django.contrib.auth.urls")),
-    path("", include("login.urls")),
+    path("accounts/", include("login.urls")),
     path("", home.get_home, name='home'),
-
     path('api/', include('api.urls')),
 ]

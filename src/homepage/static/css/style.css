@@ -1,24 +1,41 @@
-h1 {
-    color: green;
+#footer{
+    background-color: #c3dcd9;
 }
-
-#myButton,
-.login-link {
-    background-color: blue;
-    border: none;
+div.container {
+    /* padding: top right bottom left;
+    padding: top/bottom left/right; */
+    padding: 50px 20px;
+}
+.btn-outline-secondary {
+    background-color: #20B7A5; /* Adjust color as needed */
+    border-color: #20B7A5;
     color: white;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 8px;
-    transition-duration: 0.4s;
+}
+.list-group{ 
+    color: white;
+    padding: 20px 0px;
+    height: 500px; 
+    overflow-y: auto;
+    width: 20em;
 }
 
-#myButton:hover,
-.login-link:hover {
-    background-color: darkblue;
+#content-area {
+    padding: 20px;
+    height: 800px; 
+    overflow-y: auto;
+}
+/*
+.content-div{
+    display: flex;
+    flex-wrap: nowrap; 
+}
+*/
+.card{
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+a.list-group-item.list-group-item-action.active{
+    background-color: #20B7A5; /* Adjust color as needed */
+    border-color: #20B7A5;
+    color: white;
 }

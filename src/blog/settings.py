@@ -73,7 +73,7 @@ TEMPLATES = [
     },
 ]
 # django_project/settings.py
-LOGIN_REDIRECT_URL = "/"  # new
+# LOGIN_REDIRECT_URL = "/"  # new
 WSGI_APPLICATION = "blog.wsgi.application"
 
 
