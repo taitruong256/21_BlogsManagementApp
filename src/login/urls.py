@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
-from django.contrib.auth import LoginView
+from django.contrib.auth.views import LoginView
 from homepage import views as home 
 from django.urls import reverse_lazy
 from register import views as register 
@@ -37,6 +37,6 @@ class MyLoginView(LoginView):
 urlpatterns = [
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
-    # path("register/", register.get_register, name="register"),
+    path("register/", register.get_register, name="register"),
     
 ]

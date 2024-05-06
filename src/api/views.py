@@ -1,17 +1,26 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from rest_framework import generics, status
+from rest_framework.response import Response
+from .models import Blog
+from .serializers import BlogSerializer
+from rest_framework.views import APIView
 
 # Create your views here.
-def get_blog(request):
-    pass 
 
-def get_all_blogs(request):
-    pass 
+class BlogList(generics.ListCreateAPIView):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
 
-def add_blog(request):
-    pass 
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
-def update_blog(request, id):
-    pass 
 
-def delete_blog(request, id):
-    pass 
+class AddBlogAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = BlogSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
