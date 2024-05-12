@@ -26,6 +26,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", index, name= "index"),
     path("", include("login.urls")),
-    path("home", home.get_home, name='home'),
+    path("home/", home.get_home, name='home'),
     path('api/', include('api.urls')),
 ]
