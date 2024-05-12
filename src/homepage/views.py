@@ -10,3 +10,6 @@ def index(request):
     if request.user.is_authenticated:
         return redirect('home')
     return redirect('login')
+
+def add_blog(request):
+    return render(request, "add_blog.html")

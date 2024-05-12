@@ -18,6 +18,7 @@ class RegisterForm(UserCreationForm):
         model = User
         fields = ['username', 'fullname', 'email', 'password1', 'password2', 'gender', 'birthdate']
        
+
     def save(self, commit=True):
         user = super(RegisterForm, self).save(commit=False)
         user.email = self.cleaned_data['email']

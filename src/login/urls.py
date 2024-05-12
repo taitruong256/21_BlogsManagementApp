@@ -8,10 +8,8 @@ import register
 class MyLoginView(LoginView):
     template_name = 'login/login.html'
     redirect_authenticated_user = True  # Tự động chuyển hướng người dùng đã đăng nhập
-    next_page = reverse_lazy('home')  # Định nghĩa trang chuyển hướng sau đăng nhập
-    print("helo")
+    next_page = reverse_lazy('home')  # Định nghĩa trang chuyển hướng sau đăng nhập  
     def form_valid(self, form):
-
         messages.success(self.request, "Bạn đã đăng nhập thành công!")
         return super().form_valid(form)
 
