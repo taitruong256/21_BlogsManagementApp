@@ -22,6 +22,9 @@ from homepage import views as home
 from homepage.views import index
 from register import views as register 
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", index, name= "index"),
@@ -29,4 +32,4 @@ urlpatterns = [
     # path("home/", home.get_home, name='home'),
     path("home/", include("homepage.urls")),
     path('api/', include('api.urls')),
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

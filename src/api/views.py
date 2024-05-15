@@ -7,43 +7,42 @@ from .serializers import BlogSerializer
 # Create your views here.
 
 
+# class BlogByCatergory(generics.
 class BlogList(generics.ListCreateAPIView):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
 
     def get_queryset(self):
         """
-        Chế độ xem này sẽ trả về danh sách tất cả các blog
-        hoặc danh sách blog đã lọc theo từ khóa tìm kiếm.
+        This view returns a list of all the blogs,
+        or a list of blogs filtered by the search keyword.
         """
         search_query = self.request.query_params.get('search', None)
-        
         if search_query:
-            queryset = Blog.objects.filter(title__icontains=search_query)
-            # Lọc blog theo tiêu đề chứa từ khóa tìm kiếm (không phân biệt hoa thường)
+            return Blog.objects.filter(title__icontains=search_query)
         else:
-            queryset = super().get_queryset()  # Lấy tất cả các blog nếu không có từ khóa tìm kiếm
-        return queryset
+            return super().get_queryset()
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         data = serializer.data
 
-        # Tạo danh sách các category duy nhất từ các blog trong queryset
-        categories = set([blog['category'] for blog in data])
+        # Create a unique list of categories from the blogs in the queryset
+        categories = set([blog['category_name'] for blog in data])
 
-        # Tạo dictionary chứa thông tin của từng category
+        # Create a dictionary containing information for each category
         categories_data = []
         for category in categories:
             category_data = {
                 'category': category,
-                'list_blog': [blog for blog in data if blog['category'] == category]
+                'list_blog': [blog for blog in data if blog['category_name'] == category]
             }
             categories_data.append(category_data)
 
         return Response(categories_data)
-
+    
+    
 class AddBlogAPIView(generics.CreateAPIView):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
