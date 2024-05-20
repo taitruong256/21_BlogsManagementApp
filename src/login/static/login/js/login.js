@@ -1,7 +1,6 @@
-document.addEventListener('DOMContentLoaded', function() {
-    var loginButton = document.getElementById('loginButton');
-
-    loginButton.addEventListener('click', function() {
-        alert("Mình chưa xử lý nút đăng nhập bạn ơi!");
-    });
+$(document).ready(function () {
+  $("#show-signup-form").click(function () {
+    $("#signup-container").show(); // Hiển thị container đăng ký
+    $("#signin-container").hide(); // Ẩn container đăng nhập
+  });
 });

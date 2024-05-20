@@ -8,6 +8,7 @@ from django.urls import include, reverse_lazy, path
 from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib import messages
+
 class RegisterForm(UserCreationForm):
     fullname = forms.CharField(required=True)
     gender = forms.ChoiceField(choices=Profile.GENDER_CHOICES)
@@ -16,6 +17,7 @@ class RegisterForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'fullname', 'email', 'password1', 'password2', 'gender', 'birthdate']
+       
 
     def save(self, commit=True):
         user = super(RegisterForm, self).save(commit=False)
