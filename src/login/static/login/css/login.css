@@ -1,0 +1,41 @@
+#footer{
+    background-color: #c3dcd9;
+}
+div.container {
+    /* padding: top right bottom left;
+    padding: top/bottom left/right; */
+    padding: 50px 20px;
+}
+.btn-outline-secondary {
+    background-color: #20B7A5; /* Adjust color as needed */
+    border-color: #20B7A5;
+    color: white;
+}
+.list-group{ 
+    color: white;
+    padding: 20px 0px;
+    height: 500px; 
+    overflow-y: auto;
+    width: 20em;
+}
+
+#content-area {
+    padding: 20px;
+    height: 800px; 
+    overflow-y: auto;
+}
+/*
+.content-div{
+    display: flex;
+    flex-wrap: nowrap; 
+}
+*/
+.card{
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+a.list-group-item.list-group-item-action.active{
+    background-color: #20B7A5; /* Adjust color as needed */
+    border-color: #20B7A5;
+    color: white;
+}
