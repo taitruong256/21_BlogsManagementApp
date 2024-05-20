@@ -4,7 +4,8 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 # Create your views here.
 def get_home(request):
-    return render(request, "index.html")
+    user = request.user
+    return render(request, 'index.html', {'user': user})
 
 
 def index(request):
@@ -14,6 +15,9 @@ def index(request):
 
 def add_blog(request):
     return render(request, "add_blog.html")
+
+def get_blog_detail(request, user_id, blog_id):
+      return render(request, 'blog_detail.html')
 
 tmp = [
     {
