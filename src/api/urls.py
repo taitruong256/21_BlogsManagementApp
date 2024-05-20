@@ -6,4 +6,6 @@ urlpatterns = [
     path('add-blog/', views.AddBlogAPIView.as_view(), name='api_add_blog'),
     path('update-blog/<int:pk>/', views.UpdateBlogAPIView.as_view(), name='api_update_blog'),
     path('delete-blog/<int:pk>/', views.DeleteBlogAPIView.as_view(), name='api_delete_blog'),
+    path('user/<int:user_id>/', views.ProfileDetailView.as_view(), name='profile-detail'),
+    path('blog/<int:blog_id>/', views.BlogDetailView.as_view(), name='blog-detail'),
 ]

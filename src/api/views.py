@@ -3,6 +3,9 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from .models import Blog
 from .serializers import BlogSerializer
+from register.models import Profile
+from register.serializers import ProfileSerializer
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -38,6 +41,7 @@ class BlogList(generics.ListCreateAPIView):
                     'list_blog': []
                 }
             blog_data = {
+                'blog_id': blog['blog_id'], 
                 'img': blog['img'],
                 'title': blog['title'],
                 'author': blog['user']['fullname'],
@@ -63,6 +67,7 @@ class AddBlogAPIView(generics.CreateAPIView):
             return redirect('home')  # Chuyển hướng đến trang chính sau khi thêm blog thành công
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class UpdateBlogAPIView(generics.UpdateAPIView):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
@@ -75,6 +80,7 @@ class UpdateBlogAPIView(generics.UpdateAPIView):
             return redirect('home')  # Chuyển hướng về trang chính sau khi cập nhật thành công
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  # Trả về lỗi nếu dữ liệu không hợp lệ
 
+
 class DeleteBlogAPIView(generics.DestroyAPIView):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
@@ -83,3 +89,17 @@ class DeleteBlogAPIView(generics.DestroyAPIView):
         instance = self.get_object()  # Lấy đối tượng blog cần xóa
         self.perform_destroy(instance)  # Xóa đối tượng blog
         return redirect('home')  # Chuyển hướng về trang chính sau khi xóa thành công
+    
+    
+class ProfileDetailView(generics.RetrieveAPIView):
+    serializer_class = ProfileSerializer
+
+    def get_object(self):
+        user_id = self.kwargs.get("user_id")
+        return Profile.objects.get(user__id=user_id)
+    
+    
+class BlogDetailView(generics.RetrieveAPIView):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+    lookup_field = 'blog_id'

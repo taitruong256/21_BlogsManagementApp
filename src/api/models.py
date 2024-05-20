@@ -50,6 +50,7 @@ class Friend(models.Model):
     friend_id = models.AutoField(primary_key=True)
     user_from = models.ForeignKey(Profile, related_name='following', on_delete=models.CASCADE)
     user_to = models.ForeignKey(Profile, related_name='followers', on_delete=models.CASCADE)
+    date_created = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         unique_together = ('user_from', 'user_to')    # Đảm bảo rằng mỗi cặp (user_from, user_to) là duy nhất, nghĩa là một người không thể theo dõi cùng một người nhiều lần.

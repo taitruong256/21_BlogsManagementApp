@@ -15,6 +15,9 @@ def index(request):
 def add_blog(request):
     return render(request, "add_blog.html")
 
+def get_blog_detail(request, blog_id):
+      return render(request, 'blog_detail.html')
+
 tmp = [
     {
       "category": "Blogging",

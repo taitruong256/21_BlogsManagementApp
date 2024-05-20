@@ -38,7 +38,7 @@ $(document).ready(function () {
   //hiển thị tất cả những blog đã sắp xếp
   var listBlogHtml = `<div class= "row content-div " >`;
   $.each(allBlogs, function (index, title) {
-    listBlogHtml += `<div class="card col-4 " style="width: 18rem; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5);">
+    listBlogHtml += `<div class="card col-4 blog-item" data-id="${title.blog_id}" style="width: 18rem; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5); cursor: pointer;">
           <img src="${
             title.img
           }" class="card-img-top" style="object-fit: cover;">
@@ -54,6 +54,11 @@ $(document).ready(function () {
         </div>`;
   });
   $("#content-area").append(listBlogHtml + `</div>`);
+  // Sự kiện click vào blog để chuyển hướng đến trang chi tiết
+  $(".blog-item").click(function () {
+    var blogId = $(this).data("id");
+    window.location.href = `/home/blog-detail/${blogId}/`;
+  });
   //cmt kết thúc
 
   // cmt bắt đầu
@@ -68,12 +73,18 @@ $(document).ready(function () {
   for (var i = 0; i < top3Blogs.length; i++) {
     var rank = i + 1; // Adjust for 1-based ranking
     listBlogTopHtml += `
-          <a><b>Top${rank}:</b> ${top3Blogs[i].title}</a>
+      <p class="top-blog-link" data-id="${top3Blogs[i].blog_id}"><b>Top${rank}:</b> ${top3Blogs[i].title}</p>
         `;
   }
 
   // Append the HTML content to the top-div container
   $("#top-div").append(listBlogTopHtml);
+
+  // Sự kiện click vào thẻ <a> trong danh sách Top Posts
+  $(".top-blog-link").click(function () {
+    var blogId = $(this).data("id");
+    window.location.href = `/home/blog-detail/${blogId}/`;
+  });
   //cmt kết thúc
 
   //cmt bắt đầu
@@ -100,7 +111,7 @@ $(document).ready(function () {
         var theLoaiHtml = `<h2 style="padding-top: 10px;">${theLoai.category}</h2>`;
         var listBlogHtml = `<div class= "row content-div" >`;
         $.each(theLoai.list_blog, function (index, title) {
-          listBlogHtml += `<div class="card col-4" style="width: 18rem; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5);">
+          listBlogHtml += `<div class="card col-4 blog-item" data-id="${title.blog_id}" style="width: 18rem; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5); cursor: pointer;">
                 <img src="${
                   title.img
                 }" class="card-img-top"  style="object-fit: cover;">
@@ -116,9 +127,15 @@ $(document).ready(function () {
               </div>`;
         });
         $("#content-area").html(theLoaiHtml + listBlogHtml + `</div>`);
+        $(".blog-item").click(function () {
+          var blogId = $(this).data("id");
+          window.location.href = `/home/blog-detail/${blogId}/`;
+        });
       }
     });
   });
+
+
   //tìm kiếm
   function search() {
     // Get the search term from the input field
@@ -148,7 +165,7 @@ $(document).ready(function () {
     if (searchResult) {
       var listBlogHtml = `<div class= "row content-div" >`;
       $.each(searchResult, function (index, title) {
-        listBlogHtml += `<div class="card col-4" style="width: 18rem; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5);">
+        listBlogHtml += `<div class="card col-4 blog-item" data-id="${title.blog_id}" style="width: 18rem; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5); cursor: pointer;">
           <img src="${
             title.img
           }" class="card-img-top"  style="object-fit: cover;">
@@ -168,67 +185,10 @@ $(document).ready(function () {
     } else {
       $("#content-area").html("No search results found.");
     }
-  }
-
-  // Event listener for button click
-  $("#button-addon2").click(search);
-
-  // Event listener for Enter key press in the input field
-  $("#wordToSearch").keypress(function (event) {
-    if (event.keyCode === 13) {
-      // Enter key code
-      search();
-    }
-  });
-  //tìm kiếm
-  function search() {
-    // Get the search term from the input field
-    var wordToSearch = $("#wordToSearch").val().trim(); // Trim leading/trailing whitespaces
-
-    // If no search term is entered, show an alert or handle it as needed
-    if (!wordToSearch) {
-      alert("Please enter a search term!");
-      return;
-    }
-
-    // Replace the placeholder API call with your actual logic to search data
-    // This example assumes you have data in a variable called `data`
-    // (modify this part to integrate with your actual data source)
-
-    var searchResult = [];
-    for (var i = 0; i < data.length; i++) {
-      for (var j = 0; j < data[i].list_blog.length; j++) {
-        var blogPost = data[i].list_blog[j];
-        if (blogPost.title.toLowerCase().includes(wordToSearch.toLowerCase())) {
-          searchResult.push(blogPost);
-        }
-      }
-    }
-
-    // Handle the search result (modify this part to display results as needed)
-    if (searchResult) {
-      var listBlogHtml = `<div class= "row content-div" >`;
-      $.each(searchResult, function (index, title) {
-        listBlogHtml += `<div class="card col-4" style="width: 18rem; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5);">
-          <img src="${
-            title.img
-          }" class="card-img-top"  style="object-fit: cover;">
-          <div class="card-body">
-            <p><h5>${title.title}</h5></p>
-            <p><b>Author: </b>${title.author}<br>
-            <b>Content: </b>${title.content.substring(
-              0,
-              Math.min(title.content.length, 100)
-            )}...</p>
-            <p><b>Rank: ${title.rank}</b></p>
-          </div>
-        </div>`;
-      });
-
-      $("#content-area").html(listBlogHtml + `</div>`); // Use .html() to replace existing content
-    } else {
-      $("#content-area").html("No search results found.");
-    }
+    $(".blog-item").click(function () {
+      var blogId = $(this).data("id");
+      window.location.href = `/home/blog-detail/${blogId}/`;
+    });
   }
 
   // Event listener for button click
