@@ -23,14 +23,14 @@ class Blog(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='blogs')
     img = models.ImageField(upload_to='images')  
     title = models.CharField(max_length=200, unique= True)
-    description = models.TextField()
-    markdown = models.TextField()
+    description = models.TextField(default="")
+    markdown = models.TextField(default="")
     views = models.PositiveIntegerField(default=0)
     votes = models.PositiveIntegerField(default=0)
 
 
     def __str__(self):
-        return self.title
+        return str(self.blog_id) + ' | ' + self.title
 
 
 # Bảng Comment
@@ -42,7 +42,7 @@ class Comment(models.Model):
     content = models.TextField()
 
     def __str__(self):
-        return f'Comment by {self.user} on {self.blog}: {self.content}'
+        return f'{self.comment_id} | Comment by {self.user} on {self.blog}: {self.content}'
     
 
 # Bảng Friend dùng để theo dõi bạn bè 

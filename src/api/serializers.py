@@ -15,9 +15,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class BlogSerializer(serializers.ModelSerializer):
     user = ProfileSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
-    category_id = serializers.PrimaryKeyRelatedField(
-        queryset=Category.objects.all(), source='category', write_only=True)
-    img = serializers.ImageField(max_length=None, use_url=True)
+    img = serializers.ImageField(max_length=None, use_url=True, required=False)  # Cho phép trường img có thể trống
 
     class Meta:
         model = Blog
@@ -26,7 +24,7 @@ class BlogSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     user = ProfileSerializer(read_only=True)
-    blog = serializers.PrimaryKeyRelatedField(queryset=Blog.objects.all())
+    blog_id = serializers.PrimaryKeyRelatedField(source='blog', queryset=Blog.objects.all(), required=False)
     parent = serializers.PrimaryKeyRelatedField(queryset=Comment.objects.all(), allow_null=True, required=False)
 
     class Meta:
@@ -40,7 +38,7 @@ class FriendSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Friend
-        fields = ['friend_id', 'user_from', 'user_to', 'date_created']
+        fields = '__all__'
         validators = [
             serializers.UniqueTogetherValidator(
                 queryset=Friend.objects.all(),

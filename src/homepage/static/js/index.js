@@ -38,7 +38,7 @@ $(document).ready(function () {
   //hiển thị tất cả những blog đã sắp xếp
   var listBlogHtml = `<div class= "row content-div " >`;
   $.each(allBlogs, function (index, title) {
-    listBlogHtml += `<div class="card col-4 blog-item" data-id="${title.blog_id}" style="width: 18rem; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5); cursor: pointer;">
+    listBlogHtml += `<div class="card col-4 blog-item" data-user-id="${title.user_id}" data-blog-id="${title.blog_id}" style="width: 18rem; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5); cursor: pointer;">
           <img src="${
             title.img
           }" class="card-img-top" style="object-fit: cover;">
@@ -56,8 +56,9 @@ $(document).ready(function () {
   $("#content-area").append(listBlogHtml + `</div>`);
   // Sự kiện click vào blog để chuyển hướng đến trang chi tiết
   $(".blog-item").click(function () {
-    var blogId = $(this).data("id");
-    window.location.href = `/home/blog-detail/${blogId}/`;
+    var blogId = $(this).data("blog-id");
+    var userId = $(this).data("user-id");
+    window.location.href = `/home/blog-detail/${userId}/${blogId}/`;
   });
   //cmt kết thúc
 
@@ -73,7 +74,7 @@ $(document).ready(function () {
   for (var i = 0; i < top3Blogs.length; i++) {
     var rank = i + 1; // Adjust for 1-based ranking
     listBlogTopHtml += `
-      <p class="top-blog-link" data-id="${top3Blogs[i].blog_id}"><b>Top${rank}:</b> ${top3Blogs[i].title}</p>
+      <p class="top-blog-link" data-user-id="${top3Blogs[i].user_id}" data-blog-id="${top3Blogs[i].blog_id}"><b>Top${rank}:</b> ${top3Blogs[i].title}</p>
         `;
   }
 
@@ -82,8 +83,9 @@ $(document).ready(function () {
 
   // Sự kiện click vào thẻ <a> trong danh sách Top Posts
   $(".top-blog-link").click(function () {
-    var blogId = $(this).data("id");
-    window.location.href = `/home/blog-detail/${blogId}/`;
+    var blogId = $(this).data("blog-id");
+    var userId = $(this).data("user-id");
+    window.location.href = `/home/blog-detail/${userId}/${blogId}/`;
   });
   //cmt kết thúc
 
@@ -111,7 +113,7 @@ $(document).ready(function () {
         var theLoaiHtml = `<h2 style="padding-top: 10px;">${theLoai.category}</h2>`;
         var listBlogHtml = `<div class= "row content-div" >`;
         $.each(theLoai.list_blog, function (index, title) {
-          listBlogHtml += `<div class="card col-4 blog-item" data-id="${title.blog_id}" style="width: 18rem; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5); cursor: pointer;">
+          listBlogHtml += `<div class="card col-4 blog-item" data-user-id="${title.user_id}" data-blog-id="${title.blog_id}" style="width: 18rem; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5); cursor: pointer;">
                 <img src="${
                   title.img
                 }" class="card-img-top"  style="object-fit: cover;">
@@ -128,8 +130,9 @@ $(document).ready(function () {
         });
         $("#content-area").html(theLoaiHtml + listBlogHtml + `</div>`);
         $(".blog-item").click(function () {
-          var blogId = $(this).data("id");
-          window.location.href = `/home/blog-detail/${blogId}/`;
+          var blogId = $(this).data("blog-id");
+          var userId = $(this).data("user-id");
+          window.location.href = `/home/blog-detail/${userId}/${blogId}/`;
         });
       }
     });

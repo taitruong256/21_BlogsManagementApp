@@ -1,16 +1,30 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blog Detail</title>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="{% static "js/blog_detail.js" %}"></script> 
-</head>
-<body>
-  <div id="blog-detail-container">
-    <!-- Chi tiết blog sẽ được hiển thị ở đây -->
-  </div>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Blog Detail</title>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="{% static "js/blog_detail.js" %}"></script> 
+    </head>
+    <body>
+        <div id="blog-detail-container">
+            <!-- Chi tiết blog sẽ được hiển thị ở đây -->
+        </div>
+        <h2>Các bình luận </h2>
+        <ul id="commentsList" class="comments-list">
+            <!-- Danh sách comment sẽ được hiển thị ở đây -->
+        </ul>
+
+        <div class="comment-form">
+            <h3>Leave a Comment</h3>
+            <form id="commentForm">
+                {% csrf_token %}
+                {% comment %} <textarea id="comment" name="comment" placeholder="Your Comment" required></textarea> {% endcomment %}
+                <input type="text" id="content" placeholder="Comment...">
+                <button type="submit">Đăng bình luận</button>
+            </form>
+      </div>
+    </body>
 </html>

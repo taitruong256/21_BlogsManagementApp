@@ -14,6 +14,8 @@
             </div>
             <div class ="col " >
                 <div class ="float-end">
+                    <span class="me-2">Welcome, {{ user.username }}!</span> <!-- Hiển thị tên đầy đủ của người dùng -->
+                    <a href="{% url 'add_blog' %}" class="btn btn-primary me-2">Thêm bài viết</a>
                     <form method = "post" action = "{% url 'logout' %}">
                         {% csrf_token %}
                         <button class="btn btn-outline-secondary" type="submit">Logout</button>
