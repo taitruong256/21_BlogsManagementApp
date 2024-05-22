@@ -16,4 +16,7 @@ urlpatterns = [
     path('comment/delete/<int:comment_id>/', views.DeleteCommentAPIView.as_view(), name='api-delete-comment'),
     
     path('categories/', views.CategoryListAPIView.as_view(), name='category-list'),
+    
+    path('friend/add/', views.AddFriendAPIView.as_view(), name='add_friend'),
+    path('friend/remove/<int:friend_id>/', views.RemoveFriendAPIView.as_view(), name='remove_friend'),
 ]

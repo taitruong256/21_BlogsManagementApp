@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static "js/profile.js" %}"></script> 
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+</head>
+<body>
+    <h1>User Profile</h1>
+    {% if user.id != request.user.id %}
+            <button id="follow-button">Theo dõi</button>
+        {% endif %}
+    <!-- Thẻ div ẩn để lưu trữ giá trị của myId -->
+    <div id="my-id" data-my-id="{{ user.id }}" style="display:none;"></div>
+    <div>
+        <p><strong>Username:</strong> <span id="username"></span></p>
+        <p><strong>Fullname:</strong> <span id="fullname"></span></p>
+        <p><strong>Email:</strong> <span id="email"></span></p>
+        <p><strong>Gender:</strong> <span id="gender"></span></p>
+        <p><strong>Birthdate:</strong> <span id="birthdate"></span></p>
+    </div>
+    <a href="/home/add-blog/" class="btn btn-primary me-2">Thêm bài viết</a>
+</body>
+</html>

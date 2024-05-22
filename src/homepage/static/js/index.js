@@ -168,7 +168,7 @@ $(document).ready(function () {
     if (searchResult) {
       var listBlogHtml = `<div class= "row content-div" >`;
       $.each(searchResult, function (index, title) {
-        listBlogHtml += `<div class="card col-4 blog-item" data-id="${title.blog_id}" style="width: 18rem; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5); cursor: pointer;">
+        listBlogHtml += `<div class="card col-4 blog-item" data-user-id="${title.user_id}" data-blog-id="${title.blog_id}" style="width: 18rem; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5); cursor: pointer;">
           <img src="${
             title.img
           }" class="card-img-top"  style="object-fit: cover;">
@@ -189,8 +189,9 @@ $(document).ready(function () {
       $("#content-area").html("No search results found.");
     }
     $(".blog-item").click(function () {
-      var blogId = $(this).data("id");
-      window.location.href = `/home/blog-detail/${blogId}/`;
+      var blogId = $(this).data("blog-id");
+      var userId = $(this).data("user-id");
+      window.location.href = `/home/blog-detail/${userId}/${blogId}/`;
     });
   }
 

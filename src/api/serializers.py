@@ -16,6 +16,7 @@ class BlogSerializer(serializers.ModelSerializer):
     user = ProfileSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
     img = serializers.ImageField(max_length=None, use_url=True, required=False)  # Cho phép trường img có thể trống
+    comment_count = serializers.IntegerField(read_only=True)  
 
     class Meta:
         model = Blog
@@ -39,10 +40,3 @@ class FriendSerializer(serializers.ModelSerializer):
     class Meta:
         model = Friend
         fields = '__all__'
-        validators = [
-            serializers.UniqueTogetherValidator(
-                queryset=Friend.objects.all(),
-                fields=['user_from', 'user_to'],
-                message="This user is already followed."
-            )
-        ]

@@ -8,14 +8,16 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
 
         const categories = await response.json();
-        console.log(categories);
+        console.log(categories); // Sửa lỗi đánh máy ở đây
         categories.forEach(category => {
             const option = document.createElement('option');
-            option.value = category.id;
-            option.textContent = category.name;
+            option.value = category.category_id; // Sửa từ category.id thành category.category_id
+            option.textContent = category.name_category;
             categorySelect.appendChild(option);
         });
     } catch (error) {
         console.error('Error loading categories:', error);
     }
+
+    
 });

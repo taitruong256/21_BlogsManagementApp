@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
 from rest_framework import generics, status
 from rest_framework.response import Response
-from .models import Blog, Comment, Category
-from .serializers import BlogSerializer, CommentSerializer, CategorySerializer
+from .models import Blog, Comment, Category, Friend
+from .serializers import BlogSerializer, CommentSerializer, CategorySerializer, FriendSerializer
 from register.models import Profile
 from register.serializers import ProfileSerializer
 from rest_framework.permissions import IsAuthenticated
+from django.db.models import Count
 
 # Create your views here.
 
@@ -71,7 +72,7 @@ class AddBlogAPIView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             self.perform_create(serializer)  # Gọi perform_create để lưu blog
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return redirect('home')
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -115,6 +116,9 @@ class BlogDetailView(generics.RetrieveAPIView):
     serializer_class = BlogSerializer
     lookup_field = 'blog_id'
     
+    def get_queryset(self):
+        return super().get_queryset().annotate(comment_count=Count('comments'))
+    
     
 class CommentTreeView(generics.ListAPIView):
     serializer_class = CommentSerializer
@@ -142,6 +146,7 @@ class CommentTreeView(generics.ListAPIView):
                 'user': comment['user'],
                 'parent': comment['parent'],
                 'content': comment['content'],
+                'date_created': comment['date_created'],
             }
             replies = _get_replies(comment['comment_id'])
             if replies:
@@ -211,3 +216,36 @@ class DeleteCommentAPIView(generics.DestroyAPIView):
 class CategoryListAPIView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    
+    
+    
+class AddFriendAPIView(generics.CreateAPIView):
+    queryset = Friend.objects.all()
+    serializer_class = FriendSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        # Lấy đối tượng Profile tương ứng với user đăng nhập
+        user_from = self.request.user
+        user_to_id = self.request.data.get('user_to')  # Lấy id của user bạn bè từ dữ liệu request
+        user_to = Profile.objects.get(id=user_to_id)  # Lấy đối tượng Profile của user bạn bè
+        serializer.save(user_from=user_from, user_to=user_to)  # Lưu mối quan hệ bạn bè mới
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)  # Gọi perform_create để lưu mối quan hệ bạn bè
+            return redirect('home')  # Chuyển hướng sau khi thêm bạn bè thành công
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RemoveFriendAPIView(generics.DestroyAPIView):
+    queryset = Friend.objects.all()
+    serializer_class = FriendSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'friend_id'
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()  # Lấy đối tượng bạn bè cần xóa
+        self.perform_destroy(instance)  # Xóa đối tượng bạn bè
+        return redirect('home')  # Chuyển hướng sau khi xóa bạn bè thành công

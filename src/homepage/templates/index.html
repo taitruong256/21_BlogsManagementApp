@@ -69,8 +69,9 @@
             </ul>
         </div>
     </div>
-    <span class="me-2">Welcome, {{ user.username }}!</span> <!-- Hiển thị tên đầy đủ của người dùng -->
-    <a href="{% url 'add_blog' %}" class="btn btn-primary me-2">Thêm bài viết</a>
+    <a href="/home/profile/{{user.id}}/" id="user-profile-link" style="text-decoration: none; color: inherit;">
+        <p style="padding-right: 20px;"><i class="bi bi-person-fill" style="font-size: 25px;"></i>Wellcome {{user.username}}!</p>
+    </a>
 </nav>
 
 <div class="container root-container">
