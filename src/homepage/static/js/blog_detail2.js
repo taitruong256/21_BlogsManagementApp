@@ -235,14 +235,14 @@ $(document).ready(function() {
             replyForm.classList.add('reply-form');
             replyForm.innerHTML = `
                 <form class="reply-form" data-comment-id="${commentId}">
-                    <textarea placeholder="Your Reply" name="reply-comment" required></textarea>
+                    <input placeholder="Your Reply" name="reply-comment" required></input>
                     <button type="submit">Submit</button>
                 </form>
             `;
             parentComment.appendChild(replyForm);
 
             // Tự động focus vào ô văn bản
-            const textarea = replyForm.querySelector('textarea');
+            const textarea = replyForm.querySelector('input');
             textarea.focus();
         }
     });

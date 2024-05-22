@@ -225,17 +225,16 @@ class AddFriendAPIView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        # Lấy đối tượng Profile tương ứng với user đăng nhập
-        user_from = self.request.user
-        user_to_id = self.request.data.get('user_to')  # Lấy id của user bạn bè từ dữ liệu request
-        user_to = Profile.objects.get(id=user_to_id)  # Lấy đối tượng Profile của user bạn bè
-        serializer.save(user_from=user_from, user_to=user_to)  # Lưu mối quan hệ bạn bè mới
+        profile_from = Profile.objects.get(user=self.request.user)  # Lấy đối tượng Profile tương ứng với user đăng nhập
+        user_to_id = self.kwargs.get('id_user_to')  # Lấy id của user bạn bè từ URL parameters
+        profile_to = Profile.objects.get(id=user_to_id)  # Lấy đối tượng Profile của user bạn bè
+        serializer.save(user_from=profile_from, user_to=profile_to)  # Lưu mối quan hệ bạn bè mới
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data={})  # Khởi tạo serializer với dữ liệu trống
         if serializer.is_valid():
             self.perform_create(serializer)  # Gọi perform_create để lưu mối quan hệ bạn bè
-            return redirect('home')  # Chuyển hướng sau khi thêm bạn bè thành công
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -243,9 +242,43 @@ class RemoveFriendAPIView(generics.DestroyAPIView):
     queryset = Friend.objects.all()
     serializer_class = FriendSerializer
     permission_classes = [IsAuthenticated]
-    lookup_field = 'friend_id'
+    lookup_field = 'user_to'
 
     def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()  # Lấy đối tượng bạn bè cần xóa
-        self.perform_destroy(instance)  # Xóa đối tượng bạn bè
-        return redirect('home')  # Chuyển hướng sau khi xóa bạn bè thành công
+        try:
+            profile_from = Profile.objects.get(user=self.request.user)  # Lấy đối tượng Profile tương ứng với user đăng nhập
+            user_to_id = kwargs.get('id_user_to') # Lấy id của user bạn bè từ URL parameters
+            profile_to = Profile.objects.get(id=user_to_id) # Lấy đối tượng Profile của user bạn bè
+            instance = Friend.objects.get(user_from=profile_from, user_to=profile_to)  # Truy xuất mối quan hệ bạn bè
+            self.perform_destroy(instance)
+            
+            return Response({
+                'message': 'Bạn bè đã được xóa thành công',
+                'status': 'success'
+            }, status=status.HTTP_200_OK)
+
+        except Profile.DoesNotExist:
+            return Response({'error': 'Không tìm thấy hồ sơ'}, status=status.HTTP_404_NOT_FOUND)
+        except Friend.DoesNotExist:
+            return Response({'error': 'Không tìm thấy mối quan hệ bạn bè'}, status=status.HTTP_404_NOT_FOUND)
+
+    def perform_destroy(self, instance):
+        instance.delete()
+        
+class GetFollowingAPIView(generics.ListAPIView):
+    serializer_class = FriendSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user_from_id = self.kwargs.get('id_user_from')
+        profile_from = Profile.objects.get(id=user_from_id)
+        return Friend.objects.filter(user_from=profile_from)
+    
+class GetFollowerAPIView(generics.ListAPIView):
+    serializer_class = FriendSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user_to_id = self.kwargs.get('id_user_to')
+        profile_to = Profile.objects.get(id=user_to_id)
+        return Friend.objects.filter(user_to=profile_to)

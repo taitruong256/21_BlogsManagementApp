@@ -17,6 +17,8 @@ urlpatterns = [
     
     path('categories/', views.CategoryListAPIView.as_view(), name='category-list'),
     
-    path('friend/add/', views.AddFriendAPIView.as_view(), name='add_friend'),
-    path('friend/remove/<int:friend_id>/', views.RemoveFriendAPIView.as_view(), name='remove_friend'),
+    path('friend/add/<int:id_user_to>/', views.AddFriendAPIView.as_view(), name='add_friend'),
+    path('friend/delete/<int:id_user_to>/', views.RemoveFriendAPIView.as_view(), name='delete_friend'),
+    path('friend/following/<int:id_user_from>/', views.GetFollowingAPIView.as_view(), name='following_friend'),
+    path('friend/follower/<int:id_user_to>/', views.GetFollowerAPIView.as_view(), name='follower_friend'),
 ]

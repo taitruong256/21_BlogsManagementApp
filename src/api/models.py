@@ -57,7 +57,7 @@ class Friend(models.Model):
         unique_together = ('user_from', 'user_to')    # Đảm bảo rằng mỗi cặp (user_from, user_to) là duy nhất, nghĩa là một người không thể theo dõi cùng một người nhiều lần.
 
     def __str__(self):
-        return f'{self.user_from} follows {self.user_to}'
+        return f'{self.friend_id} | {self.user_from} follows {self.user_to}'
     
     
     
