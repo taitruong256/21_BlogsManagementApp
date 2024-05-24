@@ -1,4 +1,32 @@
 $(document).ready(function() {
+    const { userId, blogId } = getUrlSegments();
+    const userIdDiv = document.getElementById('my-id');
+    const myId = userIdDiv.getAttribute('data-my-id');
+    const jwtToken = getCookie('jwt'); // Lấy JWT từ cookie
+    let commentCount = 0;
+
+
+
+    $('#heart-btn').click(() => {
+        if ($('#heart-btn').attr('class') == 'bi bi-heart-fill') {
+            $('#heart-btn').attr('class', 'bi bi-heart');
+        } else {
+            $('#heart-btn').attr('class', 'bi bi-heart-fill');
+        }
+    })
+
+    
+    $("#cmt").click(function () {
+        
+    })
+
+
+    $("#logo").click(function () {
+        // Chuyển hướng người dùng đến trang chủ
+        window.location.href = "/home"; // Thay đổi URL cho phù hợp với đường dẫn của trang chủ ("/home")
+    });
+
+
     // Lấy user_id và blog_id từ URL
     function getUrlSegments() {
         const pathSegments = window.location.pathname.split("/").filter(segment => segment !== '');
@@ -8,11 +36,17 @@ $(document).ready(function() {
         };
     }
 
-    const { userId, blogId } = getUrlSegments();
+
+    // Kiểm tra nếu myId bằng với userId và hiển thị nút Delete Blog nếu đúng
+    if (myId === userId) {
+        document.getElementById('delete-blog-button').style.display = 'block';
+    } else {
+        document.getElementById('delete-blog-button').style.display = 'none';
+    }
   
 
     // Gọi API để lấy dữ liệu chi tiết của blog
-    var apiUrl = `http://127.0.0.1:8000/api/blog/${userId}/${blogId}/`;
+    var apiUrl = `http://127.0.0.1:8000/api/blog/detail/${userId}/${blogId}/`;
 
 
     // Hàm để lấy CSRF token từ cookie
@@ -30,7 +64,6 @@ $(document).ready(function() {
         }
         return cookieValue;
     }
-    var csrftoken = getCSRFToken();
 
 
     // Hàm để lấy JWT Token từ cookie 
@@ -39,9 +72,6 @@ $(document).ready(function() {
         const parts = value.split(`; ${name}=`);
         if (parts.length === 2) return parts.pop().split(';').shift();
     }
-    
-    // Lấy JWT từ cookie
-    const jwtToken = getCookie('jwt'); // 'jwt' là tên của cookie chứa JWT
 
 
     // Sử dụng phương thức GET để lấy dữ liệu của blog
@@ -49,6 +79,7 @@ $(document).ready(function() {
         url: apiUrl,
         type: 'GET',
         success: function(data) {
+            commentCount = data.comment_count;
             // Tăng trường views lên 1
             data.views += 1;
             // Lưu trữ URL của hình ảnh
@@ -58,13 +89,13 @@ $(document).ready(function() {
 
             // Gửi yêu cầu AJAX PUT với CSRF token và JWT token để xác thực người dùng. 
             $.ajax({
-                url: `/api/update-blog/${blogId}/`,
+                url: `/api/blog/update/${blogId}/`,
                 type: 'PUT',
                 data: JSON.stringify(data),
                 contentType: 'application/json',
                 headers: {
                     'Authorization': 'Bearer ' + jwtToken,  // Thêm JWT token vào header của yêu cầu
-                    'X-CSRFToken': csrftoken  // Thêm CSRF token vào header của yêu cầu nếu cần
+                    'X-CSRFToken': getCSRFToken()  // Thêm CSRF token vào header của yêu cầu nếu cần
                 },
                 success: function(response) {
                     console.log(data);
@@ -78,18 +109,43 @@ $(document).ready(function() {
 
             // Hiển thị chi tiết blog
             var blogDetailHtml = `
-                <h1>${data.title}</h1>
-                <img src="${imgUrl}" style="width: 100%; height: auto;">
-                <p><b>Tác giả: </b>${data.user.fullname}</p>
-                <p><b>Mô tả: </b>${data.description}</p>
+                <p class="bi bi-person-circle"><b>Tác giả: </b><a href="/home/profile/${data.user.user_id}/">${data.user.fullname}</a></p></p>
+                <h2>${data.title}</h2>
+                <img src="${imgUrl}" style="width: 600px; height: auto; display: block; margin: 0 auto;">
+                <p class="card-text">${data.description}</p>
                 <p><b>Lượt xem: </b>${data.views}</p>
             `;
             $("#blog-detail-container").html(blogDetailHtml);
+
+            // Hiển thị lượt yêu thích, lượt comment
+            var interactionHtml = `
+                <div id="div-heart">
+                    <i class="bi bi-heart-fill" id="heart-btn"></i> ${data.votes} hearts 
+                </div>
+                <div style="width:10px;"></div>
+                <div id='cmt'>
+                    <i class="bi bi-chat-dots"></i> ${data.comment_count} comments
+                </div>
+            `;
+            $("#interaction-container").html(interactionHtml);
         },
         error: function(xhr, status, error) {
             console.error('Error loading blog details:', error); // In ra console nếu có lỗi xảy ra
         }
     });
+
+    
+    // Tạo định dạng ngày tháng hh:mm dd-MM-yyyy 
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+        return `${hours}:${minutes} ${day}-${month}-${year}`;
+    }
 
 
     // Function để tạo một phần tử HTML cho comment
@@ -100,10 +156,20 @@ $(document).ready(function() {
         const commentHeader = document.createElement('div');
         commentHeader.classList.add('comment-header');
         commentHeader.innerHTML = `
-            <p><strong>${comment.user.fullname}:</strong></p>
-            <button class="reply-btn" data-comment-id="${comment.comment_id}">Reply</button>
-            <button class="delete-btn" data-comment-id="${comment.comment_id}">Delete</button>
+            <div>
+            <span class="comment-user"><a href="/home/profile/${comment.user.user_id}/">${comment.user.fullname}</a></span>
+            <span class="comment-date">${formatDate(comment.date_created)}</span>
+            </div>
+            <button class="reply-btn" data-comment-id="${comment.comment_id}">Phản hồi</button>
         `;
+
+        // Chỉ thêm nút delete nếu myId == comment.user.id
+        if (myId == userId) {
+            commentHeader.innerHTML += `
+                <button class="delete-btn" data-comment-id="${comment.comment_id}">Xóa</button>
+            `;
+        }
+        
         commentElement.appendChild(commentHeader);
 
         const commentContent = document.createElement('p');
@@ -139,7 +205,7 @@ $(document).ready(function() {
     // Hàm để fetch comments từ API khi trang load
     async function fetchComments() {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/comments-tree/${userId}/${blogId}/`);
+            const response = await fetch(`http://127.0.0.1:8000/api/comment/tree/${userId}/${blogId}/`);
             const comments = await response.json();
             const commentsList = document.getElementById('commentsList');
             createCommentTree(comments, commentsList);
@@ -169,14 +235,14 @@ $(document).ready(function() {
             replyForm.classList.add('reply-form');
             replyForm.innerHTML = `
                 <form class="reply-form" data-comment-id="${commentId}">
-                    <textarea placeholder="Your Reply" name="reply-comment" required></textarea>
+                    <input placeholder="Your Reply" name="reply-comment" required></input>
                     <button type="submit">Submit</button>
                 </form>
             `;
             parentComment.appendChild(replyForm);
 
             // Tự động focus vào ô văn bản
-            const textarea = replyForm.querySelector('textarea');
+            const textarea = replyForm.querySelector('input');
             textarea.focus();
         }
     });
@@ -310,6 +376,35 @@ $(document).ready(function() {
                     alert('Có lỗi xảy ra trong quá trình xóa bình luận. Xin hãy thử lại sau.');
                 }
             } 
+        }
+    });
+
+
+    // Thêm sự kiện click cho nút Delete Blog
+    document.getElementById('delete-blog-button').addEventListener('click', async function() {
+        const confirmDelete = confirm("Bạn có thực sự muốn xóa blog này?"); // Hỏi người dùng xác nhận
+
+        if (confirmDelete) {
+            try {
+                const response = await fetch(`/api/blog/delete/${blogId}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    }
+                });
+
+                if (response.ok) {
+                    alert('Blog đã được xóa thành công.');
+                    window.location.href = '/home';  //Chuyển hướng đến trang chủ sau khi xóa thành công
+                } else {
+                    const errorData = await response.json();
+                    alert('Xóa blog thất bại. Lỗi: ' + errorData.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Đã có lỗi khi xóa blog. Xin hãy thử lại sau.');
+            }
         }
     });
 });

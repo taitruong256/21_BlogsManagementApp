@@ -5,7 +5,7 @@
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
     crossorigin="anonymous"
 />
-<link rel="stylesheet" href="{% static 'css/style.css' %}" />
+<link rel="stylesheet" href="{% static 'css/index.css' %}" />
 
 {% endblock css_file %} {%block content %}
 
@@ -38,15 +38,21 @@
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item dropdown">
                     <a
-                        class="nav-link dropdown-toggle"
-                        href="#"
-                        role="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
+                    class="nav-link dropdown"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    style="text-decoration: none; color: inherit; display: flex"
                     >
-                        Dropdown
+                    <p ><i class="bi bi-person-fill" style="font-size: 25px;"></i>Wellcome {{user.username}}!</p>
                     </a>
                     <ul class="dropdown-menu" style="tran">
+                        <li>
+                            <a class="dropdown-item" href="/home/profile/{{user.id}}/">Trang Cá Nhân</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/home/profile/{{user.id}}/">Thông báo</a>
+                        </li>
                         <li>
                             <form method="post" action="{% url 'logout' %}">
                                 {% csrf_token %}
@@ -55,22 +61,12 @@
                                 </button>
                             </form>
                         </li>
-                        <li>
-                            <a class="dropdown-item" href="#">Another action</a>
-                        </li>
-                        <li><hr class="dropdown-divider" /></li>
-                        <li>
-                            <a class="dropdown-item" href="#"
-                                >Something else here</a
-                            >
-                        </li>
                     </ul>
                 </li>
             </ul>
         </div>
     </div>
-    <span class="me-2">Welcome, {{ user.username }}!</span> <!-- Hiển thị tên đầy đủ của người dùng -->
-    <a href="{% url 'add_blog' %}" class="btn btn-primary me-2">Thêm bài viết</a>
+    
 </nav>
 
 <div class="container root-container">
@@ -90,7 +86,16 @@
         <!--hiển thị tất cả blog  -->
         <div class="col-9">
             <div id="content-area" class="abc"></div>
+            <div class="pagination"></div>
+
+            <!-- Chuyển trang -->
+            <div class="pagination-controls text-center">
+                <button id="prevPage" class="btn btn-secondary">Previous page </button>
+                <span id="currentPage">1</span> / <span id="totalPages">1</span>
+                <button id="nextPage" class="btn btn-secondary">  Next  page </button>
+            </div>
         </div>
+
     </div>
 </div>
 {%endblock %} {%block script_file%} {% if messages %}

@@ -8,7 +8,11 @@ $(document).ready(function () {
   // URL API bạn muốn tải
   // const apiUrl = "https://your-api-url.com";
   // const apiUrl = "/home/data-json/";
-  const apiUrl = "http://127.0.0.1:8000/api/blogs/";
+  const apiUrl = "http://127.0.0.1:8000/api/blog/list/";
+  const blogsPerPage = 6;
+  let currentPage = 1;
+  let totalPages = 1;
+  let allBlogs = [];
 
   // Gửi yêu cầu GET đến API
   $.get(apiUrl, function (data) {
@@ -34,26 +38,86 @@ $(document).ready(function () {
     });
   });
 
-  // cmt bắt đầu
+
   //hiển thị tất cả những blog đã sắp xếp
   var listBlogHtml = `<div class= "row content-div " >`;
-  $.each(allBlogs, function (index, title) {
-    listBlogHtml += `<div class="card col-4 blog-item" data-user-id="${title.user_id}" data-blog-id="${title.blog_id}" style="width: 18rem; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5); cursor: pointer;">
-          <img src="${
-            title.img
-          }" class="card-img-top" style="object-fit: cover;">
-          <div class="card-body">
-            <p><h5>${title.title}</h5></p>
-            <p><b>Author: </b>${title.author}<br>
-            <b>Content: </b>${title.content.substring(
-              0,
-              Math.min(title.content.length, 100)
-            )}...</p>
-            <p><b>Rank: ${title.rank}</b></p>
-          </div>
-        </div>`;
-  });
-  $("#content-area").append(listBlogHtml + `</div>`);
+  // Function to load blogs and handle pagination
+  function loadBlogs() {
+    $.get(apiUrl, function (data) {
+        allBlogs = [];
+        for (var i = 0; i < data.length; i++) {
+            allBlogs = allBlogs.concat(data[i].list_blog);
+        }
+
+        allBlogs.sort(function (a, b) {
+            return parseFloat(b.rank) - parseFloat(a.rank);
+        });
+
+        totalPages = Math.ceil(allBlogs.length / blogsPerPage);
+        displayBlogs(currentPage);
+        $("#totalPages").text(totalPages);
+    });
+}
+
+    // Function to display blogs for the current page
+    function displayBlogs(page) {
+        $("#content-area").empty();
+        let start = (page - 1) * blogsPerPage;
+        let end = start + blogsPerPage;
+        let blogsToDisplay = allBlogs.slice(start, end);
+
+        let listBlogHtml = `<div class="row content-div">`;
+        $.each(blogsToDisplay, function (index, title) {
+            const nonBreakingSpace = String.fromCharCode(160);
+            var shortTitle = title.title.substring(0, 50);
+            while (shortTitle.length < 50) {
+                shortTitle += nonBreakingSpace;
+            }
+            var shortContent = title.content.substring(0, 100);
+            while (shortContent.length < 100) {
+                shortContent += nonBreakingSpace;
+            }
+
+            listBlogHtml += `<div class="card col-4 blog-item" data-user-id="${title.user_id}" data-blog-id="${title.blog_id}" style="width: 18rem; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5); cursor: pointer;">
+                <img src="${title.img}" class="card-img-top" style="object-fit: cover; height: 200px;">
+                <div class="card-body">
+                    <p><h5>${shortTitle}</h5></p>
+                    <p><b>Author: </b>${title.author}<br>
+                    <b>Content: </b>${shortContent}</p>
+                    <p><b>Rank: ${title.rank}</b></p>
+                </div>
+            </div>`;
+        });
+        $("#content-area").append(listBlogHtml + `</div>`);
+
+        $(".blog-item").click(function () {
+            var blogId = $(this).data("blog-id");
+            var userId = $(this).data("user-id");
+            window.location.href = `/home/blog-detail/${userId}/${blogId}/`;
+        });
+
+        $("#currentPage").text(currentPage);
+    }
+
+    // Event listeners for pagination buttons
+    $("#nextPage").click(function () {
+        if (currentPage < totalPages) {
+            currentPage++;
+            displayBlogs(currentPage);
+        }
+    });
+
+    $("#prevPage").click(function () {
+        if (currentPage > 1) {
+            currentPage--;
+            displayBlogs(currentPage);
+        }
+    });
+
+    // Initial load
+    loadBlogs();
+
+
   // Sự kiện click vào blog để chuyển hướng đến trang chi tiết
   $(".blog-item").click(function () {
     var blogId = $(this).data("blog-id");
@@ -64,7 +128,7 @@ $(document).ready(function () {
 
   // cmt bắt đầu
   //hiển thị tất cả top 3 blog rank cao nhất
-  var top3Blogs = allBlogs.slice(0, 3);
+  var top3Blogs = allBlogs.slice(0, 5);
 
   // Clear existing content in the top-div container (optional)
   $("#top-div").empty();
@@ -74,7 +138,7 @@ $(document).ready(function () {
   for (var i = 0; i < top3Blogs.length; i++) {
     var rank = i + 1; // Adjust for 1-based ranking
     listBlogTopHtml += `
-      <p class="top-blog-link" data-user-id="${top3Blogs[i].user_id}" data-blog-id="${top3Blogs[i].blog_id}"><b>Top${rank}:</b> ${top3Blogs[i].title}</p>
+      <p class="top-blog-link" data-user-id="${top3Blogs[i].user_id}" data-blog-id="${top3Blogs[i].blog_id}"><b>Top ${rank}:</b> ${top3Blogs[i].title}</p>
         `;
   }
 
@@ -113,17 +177,29 @@ $(document).ready(function () {
         var theLoaiHtml = `<h2 style="padding-top: 10px;">${theLoai.category}</h2>`;
         var listBlogHtml = `<div class= "row content-div" >`;
         $.each(theLoai.list_blog, function (index, title) {
+          const nonBreakingSpace = String.fromCharCode(160); // Non-breaking space character
+          // Cắt tiêu đề tối đa 50 ký tự
+          var shortTitle = title.title.substring(0, 50);
+          while (shortTitle.length < 50) {
+            shortTitle += nonBreakingSpace; // Thêm khoảng trắng cho đến khi đủ 50 ký tự
+          }
+          
+          // Cắt nội dung mô tả tối đa 100 ký tự
+          var shortContent = title.content.substring(0, 100);
+          while (shortContent.length < 100) {
+            shortContent += nonBreakingSpace; // Thêm khoảng trắng cho đến khi đủ 100 ký tự
+          }
+
+
+
           listBlogHtml += `<div class="card col-4 blog-item" data-user-id="${title.user_id}" data-blog-id="${title.blog_id}" style="width: 18rem; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5); cursor: pointer;">
                 <img src="${
                   title.img
-                }" class="card-img-top"  style="object-fit: cover;">
+                }" class="card-img-top" style="object-fit: cover; height: 200px;">
                 <div class="card-body">
-                  <p><h5>${title.title}</h5></p>
+                  <p><h5>${shortTitle}</h5></p>
                   <p><b>Author: </b>${title.author}<br>
-                  <b>Content: </b>${title.content.substring(
-                    0,
-                    Math.min(title.content.length, 100)
-                  )}...</p>
+                  <b>Content: </b>${shortContent}...</p>
                   <p><b>Rank: ${title.rank}</b></p>
                 </div>
               </div>`;
@@ -168,17 +244,27 @@ $(document).ready(function () {
     if (searchResult) {
       var listBlogHtml = `<div class= "row content-div" >`;
       $.each(searchResult, function (index, title) {
-        listBlogHtml += `<div class="card col-4 blog-item" data-id="${title.blog_id}" style="width: 18rem; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5); cursor: pointer;">
-          <img src="${
-            title.img
-          }" class="card-img-top"  style="object-fit: cover;">
+        const nonBreakingSpace = String.fromCharCode(160); // Non-breaking space character
+        // Cắt tiêu đề tối đa 50 ký tự
+        var shortTitle = title.title.substring(0, 50);
+        while (shortTitle.length < 50) {
+          shortTitle += nonBreakingSpace; // Thêm khoảng trắng cho đến khi đủ 50 ký tự
+        }
+        
+        // Cắt nội dung mô tả tối đa 100 ký tự
+        var shortContent = title.content.substring(0, 100);
+        while (shortContent.length < 100) {
+          shortContent += nonBreakingSpace; // Thêm khoảng trắng cho đến khi đủ 100 ký tự
+        }
+
+        listBlogHtml += `<div class="card col-4 blog-item" data-user-id="${title.user_id}" data-blog-id="${title.blog_id}" style="width: 18rem; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5); cursor: pointer;">
+        <img src="${
+          title.img
+        }" class="card-img-top" style="object-fit: cover; height: 200px;">
           <div class="card-body">
-            <p><h5>${title.title}</h5></p>
+            <p><h5>${shortTitle}</h5></p>
             <p><b>Author: </b>${title.author}<br>
-            <b>Content: </b>${title.content.substring(
-              0,
-              Math.min(title.content.length, 100)
-            )}...</p>
+            <b>Content: </b>${shortContent}...</p>
             <p><b>Rank: ${title.rank}</b></p>
           </div>
         </div>`;
@@ -189,8 +275,9 @@ $(document).ready(function () {
       $("#content-area").html("No search results found.");
     }
     $(".blog-item").click(function () {
-      var blogId = $(this).data("id");
-      window.location.href = `/home/blog-detail/${blogId}/`;
+      var blogId = $(this).data("blog-id");
+      var userId = $(this).data("user-id");
+      window.location.href = `/home/blog-detail/${userId}/${blogId}/`;
     });
   }
 

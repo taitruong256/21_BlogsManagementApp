@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
 from rest_framework import generics, status
 from rest_framework.response import Response
-from .models import Blog, Comment, Category
-from .serializers import BlogSerializer, CommentSerializer, CategorySerializer
+from .models import Blog, Comment, Category, Friend, Notification
+from .serializers import BlogSerializer, CommentSerializer, CategorySerializer, FriendSerializer, NotificationSerializer
 from register.models import Profile
 from register.serializers import ProfileSerializer
 from rest_framework.permissions import IsAuthenticated
+from django.db.models import Count
 
 # Create your views here.
 
@@ -71,7 +72,7 @@ class AddBlogAPIView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             self.perform_create(serializer)  # Gọi perform_create để lưu blog
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return redirect('home')
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -115,6 +116,9 @@ class BlogDetailView(generics.RetrieveAPIView):
     serializer_class = BlogSerializer
     lookup_field = 'blog_id'
     
+    def get_queryset(self):
+        return super().get_queryset().annotate(comment_count=Count('comments'))
+    
     
 class CommentTreeView(generics.ListAPIView):
     serializer_class = CommentSerializer
@@ -142,6 +146,7 @@ class CommentTreeView(generics.ListAPIView):
                 'user': comment['user'],
                 'parent': comment['parent'],
                 'content': comment['content'],
+                'date_created': comment['date_created'],
             }
             replies = _get_replies(comment['comment_id'])
             if replies:
@@ -211,3 +216,101 @@ class DeleteCommentAPIView(generics.DestroyAPIView):
 class CategoryListAPIView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    
+    
+class AddCategoryAPIView(generics.CreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]  # Only authenticated users can create categories
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)  # Created successfully
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+
+    
+class AddFriendAPIView(generics.CreateAPIView):
+    queryset = Friend.objects.all()
+    serializer_class = FriendSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        profile_from = Profile.objects.get(user=self.request.user)  # Lấy đối tượng Profile tương ứng với user đăng nhập
+        user_to_id = self.kwargs.get('id_user_to')  # Lấy id của user bạn bè từ URL parameters
+        profile_to = Profile.objects.get(id=user_to_id)  # Lấy đối tượng Profile của user bạn bè
+        serializer.save(user_from=profile_from, user_to=profile_to)  # Lưu mối quan hệ bạn bè mới
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data={})  # Khởi tạo serializer với dữ liệu trống
+        if serializer.is_valid():
+            self.perform_create(serializer)  # Gọi perform_create để lưu mối quan hệ bạn bè
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RemoveFriendAPIView(generics.DestroyAPIView):
+    queryset = Friend.objects.all()
+    serializer_class = FriendSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'user_to'
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            profile_from = Profile.objects.get(user=self.request.user)  # Lấy đối tượng Profile tương ứng với user đăng nhập
+            user_to_id = kwargs.get('id_user_to') # Lấy id của user bạn bè từ URL parameters
+            profile_to = Profile.objects.get(id=user_to_id) # Lấy đối tượng Profile của user bạn bè
+            instance = Friend.objects.get(user_from=profile_from, user_to=profile_to)  # Truy xuất mối quan hệ bạn bè
+            self.perform_destroy(instance)
+            
+            return Response({
+                'message': 'Bạn bè đã được xóa thành công',
+                'status': 'success'
+            }, status=status.HTTP_200_OK)
+
+        except Profile.DoesNotExist:
+            return Response({'error': 'Không tìm thấy hồ sơ'}, status=status.HTTP_404_NOT_FOUND)
+        except Friend.DoesNotExist:
+            return Response({'error': 'Không tìm thấy mối quan hệ bạn bè'}, status=status.HTTP_404_NOT_FOUND)
+
+    def perform_destroy(self, instance):
+        instance.delete()
+        
+class GetFollowingAPIView(generics.ListAPIView):
+    serializer_class = FriendSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user_from_id = self.kwargs.get('id_user_from')
+        profile_from = Profile.objects.get(id=user_from_id)
+        return Friend.objects.filter(user_from=profile_from)
+    
+class GetFollowerAPIView(generics.ListAPIView):
+    serializer_class = FriendSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user_to_id = self.kwargs.get('id_user_to')
+        profile_to = Profile.objects.get(id=user_to_id)
+        return Friend.objects.filter(user_to=profile_to)
+    
+    
+class NotificationListAPIView(generics.ListAPIView):
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        profile = Profile.objects.get(user=user)
+        return Notification.objects.filter(user=profile)
+
+class AddNotificationAPIView(generics.CreateAPIView):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        user_id = self.kwargs.get('user_id')  # Lấy user_id từ URL parameters
+        user = Profile.objects.get(user_id=user_id)  # Tìm đối tượng Profile tương ứng
+        serializer.save(user=user)
