@@ -46,7 +46,7 @@ $(document).ready(function() {
   
 
     // Gọi API để lấy dữ liệu chi tiết của blog
-    var apiUrl = `http://127.0.0.1:8000/api/blog/${userId}/${blogId}/`;
+    var apiUrl = `http://127.0.0.1:8000/api/blog/detail/${userId}/${blogId}/`;
 
 
     // Hàm để lấy CSRF token từ cookie
@@ -89,7 +89,7 @@ $(document).ready(function() {
 
             // Gửi yêu cầu AJAX PUT với CSRF token và JWT token để xác thực người dùng. 
             $.ajax({
-                url: `/api/update-blog/${blogId}/`,
+                url: `/api/blog/update/${blogId}/`,
                 type: 'PUT',
                 data: JSON.stringify(data),
                 contentType: 'application/json',
@@ -111,7 +111,7 @@ $(document).ready(function() {
             var blogDetailHtml = `
                 <p class="bi bi-person-circle"><b>Tác giả: </b><a href="/home/profile/${data.user.user_id}/">${data.user.fullname}</a></p></p>
                 <h2>${data.title}</h2>
-                <img src="${imgUrl}" style="width: 100%; height: auto;">
+                <img src="${imgUrl}" style="width: 600px; height: auto; display: block; margin: 0 auto;">
                 <p class="card-text">${data.description}</p>
                 <p><b>Lượt xem: </b>${data.views}</p>
             `;
@@ -205,7 +205,7 @@ $(document).ready(function() {
     // Hàm để fetch comments từ API khi trang load
     async function fetchComments() {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/comments-tree/${userId}/${blogId}/`);
+            const response = await fetch(`http://127.0.0.1:8000/api/comment/tree/${userId}/${blogId}/`);
             const comments = await response.json();
             const commentsList = document.getElementById('commentsList');
             createCommentTree(comments, commentsList);
@@ -382,11 +382,11 @@ $(document).ready(function() {
 
     // Thêm sự kiện click cho nút Delete Blog
     document.getElementById('delete-blog-button').addEventListener('click', async function() {
-        const confirmDelete = confirm("Bạn có thực sự muốn xóa bình luận này?"); // Hỏi người dùng xác nhận
+        const confirmDelete = confirm("Bạn có thực sự muốn xóa blog này?"); // Hỏi người dùng xác nhận
 
         if (confirmDelete) {
             try {
-                const response = await fetch(`/api/delete-blog/${blogId}/`, {
+                const response = await fetch(`/api/blog/delete/${blogId}/`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',

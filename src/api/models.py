@@ -27,7 +27,7 @@ class Blog(models.Model):
     markdown = models.TextField(default="")
     views = models.PositiveIntegerField(default=0)
     votes = models.PositiveIntegerField(default=0)
-
+    date_published = models.DateTimeField(auto_now_add=True) 
 
     def __str__(self):
         return str(self.blog_id) + ' | ' + self.title
@@ -60,4 +60,13 @@ class Friend(models.Model):
         return f'{self.friend_id} | {self.user_from} follows {self.user_to}'
     
     
-    
+# Bảng thông báo
+class Notification(models.Model):
+    notification_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(Profile, related_name='notifications', on_delete=models.CASCADE)
+    content = models.TextField()  
+    is_read = models.BooleanField(default=False)  # Trạng thái đã đọc
+    date_created = models.DateTimeField(auto_now_add=True)  
+
+    def __str__(self):
+        return f'{self.notification_id} | {self.user.fullname} | {self.content}'

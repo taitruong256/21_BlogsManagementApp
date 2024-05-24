@@ -46,7 +46,7 @@ div.root-container {
 
 #content-area {
     padding: 20px;
-    height: 800px;
+    height: 1100px;
     overflow-y: auto;
 }
 
@@ -64,4 +64,16 @@ a.list-group-item.list-group-item-action.active {
     background-color: #20b7a5; /* Adjust color as needed */
     border-color: #20b7a5;
     color: white;
+}
+
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination-controls button {
+    margin: 0 10px; /* Add spacing between buttons and the span */
 }

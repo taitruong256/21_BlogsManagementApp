@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from rest_framework import generics, status
 from rest_framework.response import Response
-from .models import Blog, Comment, Category, Friend
-from .serializers import BlogSerializer, CommentSerializer, CategorySerializer, FriendSerializer
+from .models import Blog, Comment, Category, Friend, Notification
+from .serializers import BlogSerializer, CommentSerializer, CategorySerializer, FriendSerializer, NotificationSerializer
 from register.models import Profile
 from register.serializers import ProfileSerializer
 from rest_framework.permissions import IsAuthenticated
@@ -218,6 +218,18 @@ class CategoryListAPIView(generics.ListAPIView):
     serializer_class = CategorySerializer
     
     
+class AddCategoryAPIView(generics.CreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]  # Only authenticated users can create categories
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)  # Created successfully
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+
     
 class AddFriendAPIView(generics.CreateAPIView):
     queryset = Friend.objects.all()
@@ -282,3 +294,23 @@ class GetFollowerAPIView(generics.ListAPIView):
         user_to_id = self.kwargs.get('id_user_to')
         profile_to = Profile.objects.get(id=user_to_id)
         return Friend.objects.filter(user_to=profile_to)
+    
+    
+class NotificationListAPIView(generics.ListAPIView):
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        profile = Profile.objects.get(user=user)
+        return Notification.objects.filter(user=profile)
+
+class AddNotificationAPIView(generics.CreateAPIView):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        user_id = self.kwargs.get('user_id')  # Lấy user_id từ URL parameters
+        user = Profile.objects.get(user_id=user_id)  # Tìm đối tượng Profile tương ứng
+        serializer.save(user=user)

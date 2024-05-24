@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Blog, Comment, Friend 
+from .models import Category, Blog, Comment, Friend, Notification
 from register.serializers import ProfileSerializer
 
 
@@ -40,3 +40,11 @@ class FriendSerializer(serializers.ModelSerializer):
     class Meta:
         model = Friend
         fields = '__all__'
+        
+        
+class NotificationSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+
+    class Meta:
+        model = Notification
+        fields = ['notification_id', 'user', 'content', 'is_read', 'date_created']

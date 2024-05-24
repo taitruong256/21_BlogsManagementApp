@@ -14,7 +14,8 @@ def index(request):
     return redirect('login')
 
 def get_add_blog(request):
-    return render(request, "add_blog.html")
+    user = request.user
+    return render(request, "add_blog.html", {'user': user})
 
 def get_blog_detail(request, user_id, blog_id):
     user = request.user

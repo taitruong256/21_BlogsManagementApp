@@ -4,9 +4,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const myId = userIdDiv.getAttribute('data-my-id');
     const jwtToken = getCookie('jwt'); // Lấy JWT từ cookie
     const followButton = $('#follow-button');
+    const addBlogButton = document.querySelector('a[href="/home/add-blog/"]');
+    const notificationButton = document.querySelector('#notificationButton');
     let isFollowing = false;
     let followingList = []; // Khởi tạo danh sách người đang theo dõi
     
+
+    // Khi click vào logo thì quay về trang chủ 
+    $("#logo").click(function () {
+        // Chuyển hướng người dùng đến trang chủ
+        window.location.href = "/home"; // Thay đổi URL cho phù hợp với đường dẫn của trang chủ ("/home")
+    });
 
 
     // Lấy user_id từ URL
@@ -22,6 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
             followButton.show();
             followButton.text(isFollowing ? 'Hủy theo dõi' : 'Theo dõi');
             followButton.data('is-following', isFollowing);
+            addBlogButton.style.display = 'none';
+            notificationButton.style.display = 'none';
         }
     }
 
@@ -44,8 +54,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 followButton.text(isFollowing ? 'Hủy theo dõi' : 'Theo dõi');
                 updateFollowButton();
 
-                console.log(followingList);
-                console.log(isFollowing);
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 console.error('Error fetching following list:', textStatus, errorThrown);
@@ -128,7 +136,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Xử lý sự kiện khi nhấn nút "Following"
     $('#followingModal').on('show.bs.modal', function() {
-        console.log("Đã click following");
         // Gọi API để lấy danh sách người đang theo dõi
         $.ajax({
             url: `/api/friend/following/${userId}`,
@@ -147,7 +154,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Xử lý sự kiện khi nhấn nút "Follower"
     $('#followerModal').on('show.bs.modal', function() {
-        console.log("Đã click follower");
         // Gọi API để lấy danh sách người theo dõi
         $.ajax({
             url: `/api/friend/follower/${userId}/`,
@@ -206,6 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    
     // Function to display following list in modal
     function displayFollowingList(data) {
         var list = $('#followingList');
@@ -251,5 +258,58 @@ document.addEventListener('DOMContentLoaded', function() {
 
     $('#followingButton').click(function() {
         $('#followingModal').modal('show');
+    });
+
+
+    // Function to display follower list in modal
+    function displayFollowerList(data) {
+        var list = $('#followerList');
+        list.empty(); // Clear previous list items
+
+        // Append each follower to the list
+        data.forEach(function(user) {
+            var listItem = $('<li>').text(user.user_from.username);
+            list.append(listItem);
+        });
+    }
+
+    $('#followingButton').click(function() {
+        $('#followingModal').modal('show');
+    });
+
+    // Hàm để gọi API và hiển thị danh sách thông báo
+    function loadNotifications() {
+        $.ajax({
+            url: '/api/notification/list/',
+            type: 'GET',
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + jwtToken,
+                'X-CSRFToken': getCSRFToken() // Thêm CSRF token nếu cần thiết
+            },
+            success: function(response) {
+                displayNotificationList(response);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('Error fetching notifications:', textStatus, errorThrown);
+            }
+        });
+    }
+
+    // Hiển thị danh sách thông báo trong modal "Notifications"
+    function displayNotificationList(notifications) {
+        var list = $('#notificationList');
+        list.empty(); // Xóa danh sách cũ trước khi thêm mới
+
+        // Thêm mỗi thông báo vào danh sách
+        notifications.forEach(function(notification) {
+            var listItem = $('<li>').text(notification.content);
+            list.append(listItem);
+        });
+    }
+
+    // Xử lý sự kiện khi nhấn nút "Notifications"
+    $('#notificationModal').on('show.bs.modal', function() {
+        loadNotifications();
     });
 });

@@ -5,7 +5,7 @@
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
     crossorigin="anonymous"
 />
-<link rel="stylesheet" href="{% static 'css/style.css' %}" />
+<link rel="stylesheet" href="{% static 'css/index.css' %}" />
 
 {% endblock css_file %} {%block content %}
 
@@ -51,6 +51,9 @@
                             <a class="dropdown-item" href="/home/profile/{{user.id}}/">Trang Cá Nhân</a>
                         </li>
                         <li>
+                            <a class="dropdown-item" href="/home/profile/{{user.id}}/">Thông báo</a>
+                        </li>
+                        <li>
                             <form method="post" action="{% url 'logout' %}">
                                 {% csrf_token %}
                                 <button class="dropdown-item" type="submit">
@@ -83,7 +86,16 @@
         <!--hiển thị tất cả blog  -->
         <div class="col-9">
             <div id="content-area" class="abc"></div>
+            <div class="pagination"></div>
+
+            <!-- Chuyển trang -->
+            <div class="pagination-controls text-center">
+                <button id="prevPage" class="btn btn-secondary">Previous page </button>
+                <span id="currentPage">1</span> / <span id="totalPages">1</span>
+                <button id="nextPage" class="btn btn-secondary">  Next  page </button>
+            </div>
         </div>
+
     </div>
 </div>
 {%endblock %} {%block script_file%} {% if messages %}
