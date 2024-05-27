@@ -8,6 +8,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const notificationButton = document.querySelector('#notificationButton');
     let isFollowing = false;
     let followingList = []; // Khởi tạo danh sách người đang theo dõi
+
+
+    document.getElementById('logout').addEventListener('click', function() {
+        window.location.href = '/logout';  // Thay '/logout' bằng URL logout của bạn
+    });
     
 
     if (myId !== userId) {

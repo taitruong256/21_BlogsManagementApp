@@ -2,6 +2,7 @@ from django.db import models
 from register.models import Profile
 from django.core.files.storage import FileSystemStorage
 from ckeditor.fields import RichTextField
+from django.utils import timezone
 
 
 # Thiết lập đường dẫn lưu trữ cho hình ảnh

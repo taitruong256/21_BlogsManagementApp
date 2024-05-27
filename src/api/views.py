@@ -7,6 +7,8 @@ from register.models import Profile
 from register.serializers import ProfileSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Count
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 
 # Create your views here.
 
@@ -19,12 +21,15 @@ class BlogList(generics.ListCreateAPIView):
         """
         This view returns a list of all the blogs,
         or a list of blogs filtered by the search keyword.
+        Only blogs with date_published before the current time are returned.
         """
         search_query = self.request.query_params.get('search', None)
+        current_time = timezone.now()
+        
         if search_query:
-            return Blog.objects.filter(title__icontains=search_query)
+            return Blog.objects.filter(title__icontains=search_query, date_published__lt=current_time)
         else:
-            return super().get_queryset()
+            return Blog.objects.filter(date_published__lt=current_time)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -34,22 +39,24 @@ class BlogList(generics.ListCreateAPIView):
         # Create a dictionary containing information for each category
         categories_data = {}
         for blog in data:
-            category_name = blog['category']['name_category']
-            if category_name not in categories_data:
-                categories_data[category_name] = {
-                    'category': category_name,
-                    'list_blog': []
+            published_time = parse_datetime(blog['date_published'])
+            if published_time < timezone.now():
+                category_name = blog['category']['name_category']
+                if category_name not in categories_data:
+                    categories_data[category_name] = {
+                        'category': category_name,
+                        'list_blog': []
+                    }
+                blog_data = {
+                    'blog_id': blog['blog_id'], 
+                    'user_id': blog['user']['user_id'], 
+                    'img': blog['img'],
+                    'title': blog['title'],
+                    'author': blog['user']['fullname'],
+                    'content': blog['description'],
+                    'rank': blog['views']
                 }
-            blog_data = {
-                'blog_id': blog['blog_id'], 
-                'user_id': blog['user']['user_id'], 
-                'img': blog['img'],
-                'title': blog['title'],
-                'author': blog['user']['fullname'],
-                'content': blog['description'],
-                'rank': blog['views']
-            }
-            categories_data[category_name]['list_blog'].append(blog_data)
+                categories_data[category_name]['list_blog'].append(blog_data)
 
         # Convert the categories_data dictionary to a list
         result = list(categories_data.values())
@@ -62,10 +69,12 @@ class UserBlogList(generics.ListAPIView):
     def get_queryset(self):
         """
         This view returns a list of blogs filtered by user_id.
+        Only blogs with date_published before the current time are returned.
         """
         user_id = self.kwargs['user_id']
         profile = Profile.objects.get(user_id=user_id)
-        return Blog.objects.filter(user=profile)
+        current_time = timezone.now()
+        return Blog.objects.filter(user=profile, date_published__lt=current_time)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -75,22 +84,24 @@ class UserBlogList(generics.ListAPIView):
         # Create a dictionary containing information for each category
         categories_data = {}
         for blog in data:
-            category_name = blog['category']['name_category']
-            if category_name not in categories_data:
-                categories_data[category_name] = {
-                    'category': category_name,
-                    'list_blog': []
+            published_time = parse_datetime(blog['date_published'])
+            if published_time < timezone.now():
+                category_name = blog['category']['name_category']
+                if category_name not in categories_data:
+                    categories_data[category_name] = {
+                        'category': category_name,
+                        'list_blog': []
+                    }
+                blog_data = {
+                    'blog_id': blog['blog_id'], 
+                    'user_id': blog['user']['user_id'], 
+                    'img': blog['img'],
+                    'title': blog['title'],
+                    'author': blog['user']['fullname'],
+                    'content': blog['description'],
+                    'rank': blog['views']
                 }
-            blog_data = {
-                'blog_id': blog['blog_id'], 
-                'user_id': blog['user']['user_id'], 
-                'img': blog['img'],
-                'title': blog['title'],
-                'author': blog['user']['fullname'],
-                'content': blog['description'],
-                'rank': blog['views']
-            }
-            categories_data[category_name]['list_blog'].append(blog_data)
+                categories_data[category_name]['list_blog'].append(blog_data)
 
         # Convert the categories_data dictionary to a list
         result = list(categories_data.values())
