@@ -20,11 +20,29 @@ div.container {
 
 .comment {
     background-color: #fff;
-    border: 1px solid #ddd;
+    border: none; /* Ẩn viền ngoài của comment */
     border-radius: 5px;
     padding: 10px;
     margin-bottom: 10px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.comment::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -20px;
+    border-left: 2px solid #ddd;
+}
+
+.comment .card {
+    border: none;
+}
+
+.comment .card-body {
+    padding: 0;
 }
 
 .comment-header {
@@ -65,11 +83,21 @@ div.container {
 .comments-list {
     list-style: none;
     padding: 0;
+    margin-left: 20px; /* Adjust the margin for nested comments */
 }
 
 .reply-btn, .delete-btn {
     font-size: 0.8em;
     padding: 5px;
+    background-color: transparent; /* Bỏ nền */
+    color: blue;
+    border: none; /* Bỏ viền */
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.reply-btn:hover, .delete-btn:hover {
+    color: darkblue;
 }
 
 .comment-item {
@@ -77,25 +105,22 @@ div.container {
     padding: 10px 0;
     margin-bottom: 10px;
 }
-.comment-header {
-    margin-bottom: 10px;
-}
-.comment-user {
-    font-weight: bold;
-    margin: 0;
-}
+
 .comment-body {
     margin: 10px 0;
 }
+
 .comment-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
+
 .comment-date {
     color: gray;
     font-size: 0.9em;
 }
+
 .reply-btn {
     background-color: transparent;
     border: none;
@@ -103,6 +128,7 @@ div.container {
     cursor: pointer;
     text-decoration: underline;
 }
+
 .reply-btn:hover {
     color: darkblue;
 }

@@ -47,7 +47,48 @@ class BlogList(generics.ListCreateAPIView):
                 'title': blog['title'],
                 'author': blog['user']['fullname'],
                 'content': blog['description'],
-                'rank': blog['votes']
+                'rank': blog['views']
+            }
+            categories_data[category_name]['list_blog'].append(blog_data)
+
+        # Convert the categories_data dictionary to a list
+        result = list(categories_data.values())
+
+        return Response(result)
+    
+class UserBlogList(generics.ListAPIView):
+    serializer_class = BlogSerializer
+
+    def get_queryset(self):
+        """
+        This view returns a list of blogs filtered by user_id.
+        """
+        user_id = self.kwargs['user_id']
+        profile = Profile.objects.get(user_id=user_id)
+        return Blog.objects.filter(user=profile)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        data = serializer.data
+
+        # Create a dictionary containing information for each category
+        categories_data = {}
+        for blog in data:
+            category_name = blog['category']['name_category']
+            if category_name not in categories_data:
+                categories_data[category_name] = {
+                    'category': category_name,
+                    'list_blog': []
+                }
+            blog_data = {
+                'blog_id': blog['blog_id'], 
+                'user_id': blog['user']['user_id'], 
+                'img': blog['img'],
+                'title': blog['title'],
+                'author': blog['user']['fullname'],
+                'content': blog['description'],
+                'rank': blog['views']
             }
             categories_data[category_name]['list_blog'].append(blog_data)
 

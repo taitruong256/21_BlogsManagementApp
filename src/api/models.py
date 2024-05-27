@@ -1,6 +1,7 @@
 from django.db import models
 from register.models import Profile
 from django.core.files.storage import FileSystemStorage
+from ckeditor.fields import RichTextField
 
 
 # Thiết lập đường dẫn lưu trữ cho hình ảnh
@@ -24,7 +25,7 @@ class Blog(models.Model):
     img = models.ImageField(upload_to='images')  
     title = models.CharField(max_length=200, unique= True)
     description = models.TextField(default="")
-    markdown = models.TextField(default="")
+    markdown = RichTextField()
     views = models.PositiveIntegerField(default=0)
     votes = models.PositiveIntegerField(default=0)
     date_published = models.DateTimeField(auto_now_add=True) 

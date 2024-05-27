@@ -83,8 +83,8 @@ $(document).ready(function () {
                 <div class="card-body">
                     <p><h5>${shortTitle}</h5></p>
                     <p><b>Author: </b>${title.author}<br>
-                    <b>Content: </b>${shortContent}</p>
-                    <p><b>Rank: ${title.rank}</b></p>
+                    <b>Description: </b>${shortContent}</p>
+                    <p><b>Views: ${title.rank}</b></p>
                 </div>
             </div>`;
         });
@@ -199,8 +199,8 @@ $(document).ready(function () {
                 <div class="card-body">
                   <p><h5>${shortTitle}</h5></p>
                   <p><b>Author: </b>${title.author}<br>
-                  <b>Content: </b>${shortContent}...</p>
-                  <p><b>Rank: ${title.rank}</b></p>
+                  <b>Description: </b>${shortContent}...</p>
+                  <p><b>Views: ${title.rank}</b></p>
                 </div>
               </div>`;
         });
@@ -264,8 +264,8 @@ $(document).ready(function () {
           <div class="card-body">
             <p><h5>${shortTitle}</h5></p>
             <p><b>Author: </b>${title.author}<br>
-            <b>Content: </b>${shortContent}...</p>
-            <p><b>Rank: ${title.rank}</b></p>
+            <b>Description: </b>${shortContent}...</p>
+            <p><b>Views: ${title.rank}</b></p>
           </div>
         </div>`;
       });
