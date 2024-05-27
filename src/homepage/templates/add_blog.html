@@ -3,6 +3,7 @@
 <html>
 <head>
     <title>Add Blog</title>
+    {% load widget_tweaks %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Include jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -10,8 +11,27 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="{% static 'js/add_blog.js' %}"></script> 
     <link rel="stylesheet" href="{% static 'css/add_blog.css' %}">
+    <!-- Include CKEditor full package -->
+    <script src="https://cdn.ckeditor.com/4.16.0/full/ckeditor.js"></script>
 </head>
 <body>
+
+    <!-- Header -->
+    <div class = "row">
+        <div class = "col">
+            <img id="logo" src="{% static 'img/Logo.jpg' %}" alt="Logo" />
+        </div>
+        <div class="col">
+            <div class ="float-end div-logout">
+                <button class="btn btn-outline-secondary" id ='logout' type="button">Logout</button>
+            </div>
+            <div class ="float-end div-user">
+                <a href="/home/profile/{{user.id}}/" id="user-profile-link" style="text-decoration: none; color: inherit;">
+                    <p style="padding-right: 20px;"><i class="bi bi-person-fill" style="font-size: 25px;"></i>Wellcome {{user.username}}!</p>
+                </a>
+            </div>
+        </div>
+    </div>
   
     <!-- Category Modal -->
     <div class="modal fade" id="categoryModal" tabindex="-1" role="dialog" aria-labelledby="categoryModalLabel" aria-hidden="true">
@@ -83,5 +103,47 @@
             <button type="submit" class="btn-submit">Add Blog</button>
         </form>
     </div>
+
+    <!--footer-->
+    <div class="container my-5">
+        <footer>        
+            <div class="row" id = "footer" style="padding: 20px 0px;"> 
+                <div class="col-4">
+                    <h6 class="text-uppercase fw-bold">Liên hệ với chúng tôi</h6>
+                    <hr class="mb-4 mt-0 d-inline-block mx-auto" style="width: 60px; background-color: #040404; height: 2px"/>
+                    <p><i class="bi bi-envelope"></i> phuga@gmail.com<br>
+                    <i class="fab fa-facebook-f"></i> facebook.com/congaphu<br>
+                    <i class="bi bi-telephone-fill"></i> 0123456789<br>
+                    <i class="bi bi-geo-alt-fill"></i> Tòa H, ĐH Công nghiệp TP.HCM</p>
+                </div>
+
+                <div class="col-4">
+                    <h6 class="text-uppercase fw-bold">Về Green Blog</h6>
+                    <hr class="mb-4 mt-0 d-inline-block mx-auto" style="width: 60px; background-color: #040404; height: 2px"/>
+                    <p>Chúng tôi là một nền tảng viết blog</p>
+                </div>
+
+                <div class="col-4">
+                    <h6 class="text-uppercase fw-bold">Dịch vụ</h6>
+                    <hr class="mb-4 mt-0 d-inline-block mx-auto" style="width: 60px; background-color: #040404; height: 2px"/>
+                    <p>Viết blog</p>
+                </div>
+            </div>
+
+            <div class="text-center p-3" style="color: #20B7A5;">
+                <h3>From IUH With Love<i class="bi bi-hearts"></i></h3>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        CKEDITOR.replace('markdown', {
+            height: 500
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/297d4740e4.js" crossorigin="anonymous"></script>
 </body>
 </html>

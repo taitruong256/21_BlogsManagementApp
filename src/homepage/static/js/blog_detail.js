@@ -111,8 +111,7 @@ $(document).ready(function() {
             var blogDetailHtml = `
                 <p class="bi bi-person-circle"><b>Tác giả: </b><a href="/home/profile/${data.user.user_id}/">${data.user.fullname}</a></p></p>
                 <h2>${data.title}</h2>
-                <img src="${imgUrl}" style="width: 600px; height: auto; display: block; margin: 0 auto;">
-                <p class="card-text">${data.description}</p>
+                ${data.markdown}
                 <p><b>Lượt xem: </b>${data.views}</p>
             `;
             $("#blog-detail-container").html(blogDetailHtml);
@@ -123,6 +122,9 @@ $(document).ready(function() {
                     <i class="bi bi-heart-fill" id="heart-btn"></i> ${data.votes} hearts 
                 </div>
                 <div style="width:10px;"></div>
+                <div
+                    id="div-cmt" data-bs-toggle="collapse" data-bs-target="#collapseCmt" aria-expanded="false" aria-controls="collapseCmt">
+                </div>
                 <div id='cmt'>
                     <i class="bi bi-chat-dots"></i> ${data.comment_count} comments
                 </div>
@@ -147,44 +149,65 @@ $(document).ready(function() {
         return `${hours}:${minutes} ${day}-${month}-${year}`;
     }
 
+    // Hàm để tính toán thời gian tương đối
+    function formatRelativeTime(dateString) {
+        const now = new Date();
+        const date = new Date(dateString);
+        const diff = now - date;
+
+        const seconds = Math.floor(diff / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+
+        if (days > 0) {
+            return `${days} ngày trước`;
+        } else if (hours > 0) {
+            return `${hours} giờ trước`;
+        } else if (minutes > 0) {
+            return `${minutes} phút trước`;
+        } else {
+            return `${seconds} giây trước`;
+        }
+    }
+
 
     // Function để tạo một phần tử HTML cho comment
     function createCommentElement(comment) {
         const commentElement = document.createElement('li');
         commentElement.classList.add('comment');
 
-        const commentHeader = document.createElement('div');
-        commentHeader.classList.add('comment-header');
-        commentHeader.innerHTML = `
-            <div>
-            <span class="comment-user"><a href="/home/profile/${comment.user.user_id}/">${comment.user.fullname}</a></span>
-            <span class="comment-date">${formatDate(comment.date_created)}</span>
+        const commentContent = `
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5S8QYOnHsZ-tg7_hpRQu7KV3VtLWmxd1EIO2X0AmvqQ&s" class="rounded-circle me-2" width="32" height="32"/>
+                            </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold"><a href="/home/profile/${comment.user.user_id}/">${comment.user.fullname}</a></div>
+                                    <div class="text-muted">${formatRelativeTime(comment.date_created)}</div>
+                                    <div>${comment.content}</div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <button class="btn btn-link reply-btn" data-comment-id="${comment.comment_id}">Phản hồi</button>
+                                ${userId === myId ? `<button class="btn btn-link delete-btn" data-comment-id="${comment.comment_id}">Xóa</button>` : ''}
+                            </div>
+                            <ul class="comments-list ms-3"></ul>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <button class="reply-btn" data-comment-id="${comment.comment_id}">Phản hồi</button>
         `;
 
-        // Chỉ thêm nút delete nếu myId == comment.user.id
-        if (myId == userId) {
-            commentHeader.innerHTML += `
-                <button class="delete-btn" data-comment-id="${comment.comment_id}">Xóa</button>
-            `;
-        }
-        
-        commentElement.appendChild(commentHeader);
-
-        const commentContent = document.createElement('p');
-        commentContent.classList.add('comment-content');
-        commentContent.textContent = comment.content;
-        commentElement.appendChild(commentContent);
-
-        // Tạo một thẻ ul để chứa các phản hồi
-        const repliesContainer = document.createElement('ul');
-        repliesContainer.classList.add('comments-list');
-        repliesContainer.style.marginLeft = '10px'; // Thụt replies
-        commentElement.appendChild(repliesContainer);
+        commentElement.innerHTML = commentContent;
 
         return commentElement;
     }
+    
 
 
     // Function để tạo cây comment
@@ -407,4 +430,14 @@ $(document).ready(function() {
             }
         }
     });
+});
+
+// Đăng ký sự kiện click cho nút thả tim sau khi phần tử được tạo ra
+$(document).on('click', '#heart-btn', function() {
+    console.log("Đã click thả tim. ");
+    if ($(this).hasClass('bi-heart-fill')) {
+        $(this).removeClass('bi-heart-fill').addClass('bi-heart');
+    } else {
+        $(this).removeClass('bi-heart').addClass('bi-heart-fill');
+    }
 });

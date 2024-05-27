@@ -10,6 +10,10 @@ document.addEventListener('DOMContentLoaded', function() {
     let followingList = []; // Khởi tạo danh sách người đang theo dõi
     
 
+    if (myId !== userId) {
+        $('#follow-button').removeClass('d-none');
+    }
+
     // Khi click vào logo thì quay về trang chủ 
     $("#logo").click(function () {
         // Chuyển hướng người dùng đến trang chủ
@@ -26,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Cập nhật trạng thái của nút "Theo dõi"
     function updateFollowButton() {
+        console.log("Đã gọi cập nhật nút theo dõi");
         if (myId !== userId) {
             followButton.show();
             followButton.text(isFollowing ? 'Hủy theo dõi' : 'Theo dõi');
@@ -51,6 +56,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 followingList = response.map(item => item.user_to.user_id);
                 // Kiểm tra xem userId có trong danh sách followingList hay không
                 isFollowing = followingList.includes(parseInt(userId));
+                console.log("Đã gọi API người theo dõi");
+                console.log(isFollowing);
                 followButton.text(isFollowing ? 'Hủy theo dõi' : 'Theo dõi');
                 updateFollowButton();
 

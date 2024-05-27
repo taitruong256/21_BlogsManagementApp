@@ -43,7 +43,17 @@ INSTALLED_APPS = [
     "register",
     "api",
     "homepage",
+    'widget_tweaks',
+    'ckeditor',
 ]
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 300,
+        'width': '100%',
+    },
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

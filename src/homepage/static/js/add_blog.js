@@ -6,6 +6,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         $('#categoryModal').modal('show');
     });
 
+    $("#logo").click(function () {
+        // Chuyển hướng người dùng đến trang chủ
+        window.location.href = "/home"; // Thay đổi URL cho phù hợp với đường dẫn của trang chủ ("/home")
+    });
+
 
     // Hàm để lấy CSRF token từ cookie
     function getCSRFToken() {

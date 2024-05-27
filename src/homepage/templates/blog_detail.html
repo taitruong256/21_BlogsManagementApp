@@ -44,14 +44,6 @@
                         <div class="card-body" style="display: flex;" id="interaction-container">
                             <!-- Lượt yêu thích, lượt xem, lượt comment sẽ được hiển thị ở đây -->
                         </div>
-                        {% comment %} <div id="div-heart">
-                            <i class="bi bi-heart-fill" id="heart-btn"></i>
-                            2B likes
-                        </div>
-                        <div style="width:10px;"></div>
-                        <div id ='cmt'>
-                            <i class="bi bi-chat-dots"></i> 20B comments
-                        </div> {% endcomment %}
                     </div>
                 </article>
             </div>
@@ -60,13 +52,21 @@
                 <h3>Thêm bình luận </h3>
                 <form id="commentForm">
                     {% csrf_token %}
-                    {% comment %} <textarea id="comment" name="comment" placeholder="Your Comment" required></textarea> {% endcomment %}
                     <input type="text" id="content" placeholder="Comment...">
                     <button type="submit">Đăng bình luận</button>
                 </form>
             </div>
 
             <h2>Các bình luận </h2>
+            <div id="comments-container" class="collapse">
+                <div class="card">
+                    <div class="card-header">Comments</div>
+                    <div class="card-body" id="comments-list">
+                        <!-- Comments will be appended here -->
+                    </div>
+                </div>
+            </div>
+
             <ul id="commentsList" class="comments-list">
                 <!-- Danh sách comment sẽ được hiển thị ở đây -->
             </ul>
