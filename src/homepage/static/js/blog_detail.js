@@ -6,6 +6,10 @@ $(document).ready(function() {
     let commentCount = 0;
 
 
+    document.getElementById('logout').addEventListener('click', function() {
+        window.location.href = '/logout';  // Thay '/logout' bằng URL logout của bạn
+    });
+
 
     $('#heart-btn').click(() => {
         if ($('#heart-btn').attr('class') == 'bi bi-heart-fill') {
@@ -27,6 +31,12 @@ $(document).ready(function() {
     });
 
 
+    // Xử lý sự kiện khi click nút Update thì 
+    document.getElementById('update-blog-button').addEventListener('click', function() {
+        window.location.href = `/home/update-blog/${userId}/${blogId}/`;
+    });
+
+
     // Lấy user_id và blog_id từ URL
     function getUrlSegments() {
         const pathSegments = window.location.pathname.split("/").filter(segment => segment !== '');
@@ -39,8 +49,10 @@ $(document).ready(function() {
 
     // Kiểm tra nếu myId bằng với userId và hiển thị nút Delete Blog nếu đúng
     if (myId === userId) {
+        document.getElementById('update-blog-button').style.display = 'block';
         document.getElementById('delete-blog-button').style.display = 'block';
     } else {
+        document.getElementById('update-blog-button').style.display = 'none';
         document.getElementById('delete-blog-button').style.display = 'none';
     }
   
@@ -89,7 +101,7 @@ $(document).ready(function() {
 
             // Gửi yêu cầu AJAX PUT với CSRF token và JWT token để xác thực người dùng. 
             $.ajax({
-                url: `/api/blog/update/${blogId}/`,
+                url: `/api/blog/update/${userId}/${blogId}/`,
                 type: 'PUT',
                 data: JSON.stringify(data),
                 contentType: 'application/json',
@@ -279,7 +291,7 @@ $(document).ready(function() {
         // Kiểm tra xem người dùng đã gửi form reply hay không
         if (form.classList.contains('reply-form')) {
             console.log("đã click vào form");
-            const content = form.querySelector('textarea').value;
+            const content = form.querySelector('input').value;
             const parentCommentId = form.dataset.commentId; // Lấy ID của comment từ thuộc tính data của form
             console.log(parentCommentId)
             try {

@@ -17,6 +17,10 @@ def get_add_blog(request):
     user = request.user
     return render(request, "add_blog.html", {'user': user})
 
+def get_update_blog(request, user_id, blog_id):
+    user = request.user
+    return render(request, "update_blog.html", {'user': user})
+
 def get_blog_detail(request, user_id, blog_id):
     user = request.user
     return render(request, 'blog_detail.html', {'user': user})
