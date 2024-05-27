@@ -320,3 +320,12 @@ document.addEventListener('DOMContentLoaded', function() {
         loadNotifications();
     });
 });
+
+
+
+  // Sự kiện click vào blog để chuyển hướng đến trang chi tiết
+$(".blog-item").click(function () {
+    var blogId = $(this).data("blog-id");
+    var userId = $(this).data("user-id");
+    window.location.href = `/home/blog-detail/${userId}/${blogId}/`;
+});

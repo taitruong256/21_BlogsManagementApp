@@ -21,10 +21,15 @@ class BlogList(generics.ListCreateAPIView):
         or a list of blogs filtered by the search keyword.
         """
         search_query = self.request.query_params.get('search', None)
+        user_id = self.kwargs.get('user_id', None)
+        
+        if user_id:
+            profile = Profile.objects.get(user_id=user_id)
+            return Blog.objects.filter(user=profile).order_by('-date_published')
         if search_query:
             return Blog.objects.filter(title__icontains=search_query)
-        else:
-            return super().get_queryset()
+        
+        return super().get_queryset()
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()

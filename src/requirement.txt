@@ -4,3 +4,4 @@ django-ckeditor
 djangorestframework
 markdown
 django-filter  
+Pillow
