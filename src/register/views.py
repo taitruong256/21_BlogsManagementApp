@@ -1,13 +1,21 @@
-from django.shortcuts import render
-
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
 from .models import Profile
 from django.urls import include, reverse_lazy, path
 from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib import messages
+from rest_framework.response import Response
+from .serializers import ProfileSerializer
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Profile
+from .serializers import ProfileUpdateSerializer
+from django.contrib.auth.models import User
+from django.core.files.storage import default_storage
+import os
+import logging
 
 class RegisterForm(UserCreationForm):
     fullname = forms.CharField(required=True)
@@ -52,3 +60,43 @@ class RegisterView(View):
 
 
 
+logger = logging.getLogger(__name__)
+@api_view(['POST'])
+def update_profile(request, user_id):
+    logger.debug(f"Received update request for user_id {user_id}")
+    logger.debug(f"Request data: {request.data}")
+    logger.debug(f"Request files: {request.FILES}")
+
+    try:
+        user = User.objects.get(id=user_id)
+        profile = Profile.objects.get(user=user)
+    except User.DoesNotExist:
+        logger.error("User not found")
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Profile.DoesNotExist:
+        logger.error("Profile not found")
+        return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    data = request.data.copy()
+
+    if 'gender' in data and data['gender'] not in ['male', 'female']:
+        data['gender'] = 'male'  # Set a default value if necessary
+
+    serializer = ProfileUpdateSerializer(profile, data=data)
+    if serializer.is_valid():
+        print("helo1")
+        serializer.save()
+        if 'profile_picture' in request.FILES:
+            profile_picture = request.FILES['profile_picture']
+            if profile.profile_picture and profile.profile_picture.name:
+                if os.path.isfile(profile.profile_picture.path):
+                    os.remove(profile.profile_picture.path)
+            profile_picture_path = default_storage.save(f'profiles/{user.id}/profile_picture.jpg', profile_picture)
+            profile.profile_picture = profile_picture_path
+            profile.save()
+        updated_data = ProfileUpdateSerializer(profile).data
+        logger.debug(f"Updated profile data: {updated_data}")
+        return Response(updated_data, status=status.HTTP_200_OK)
+    else:
+        logger.error(f"Serializer errors: {serializer.errors}")
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

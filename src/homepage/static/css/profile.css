@@ -65,5 +65,51 @@
 }
 
 .post .content > p {
-  margin: 0 0.75rem;
+  margin: 0.75rem 0.75rem;
+}
+
+.custom-text-link {
+  color:black; /* Màu xanh Instagram */
+  text-decoration: none; /* Xóa gạch chân mặc định của liên kết */
+  font-weight: 600; /* Tăng độ đậm của văn bản */
+  font-size: 16px; /* Kích thước chữ */
+  
+  border-radius: 4px; /* Bo góc */
+  transition: background-color 0.3s, color 0.3s; /* Hiệu ứng chuyển màu mượt mà */
+}
+
+.custom-text-link:hover {
+  background-color: #e8f4fb; /* Màu nền khi hover */
+  color: #007bff; /* Màu văn bản khi hover */
+  text-decoration: none; /* Xóa gạch chân khi hover */
+}
+
+/* CSS for the spinner */
+.spinner {
+  display: none; /* Ẩn spinner ban đầu */
+  position: fixed;
+  z-index: 999;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.spinner .spinner-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
