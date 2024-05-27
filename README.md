@@ -1,4 +1,4 @@
-# Tên ứng dụng
+# GreenBlog
 
 - Mô tả vắn tắt tên ứng dụng ở đây (Gợi ý: ứng dụng giải quyết vấn đề gì, có các đối tượng người dùng như thế nào, có các chức năng gì...)
 
@@ -15,10 +15,10 @@ Hướng dẫn cài đặt và chạy sau khi pull project từ github về (Lư
 
 ## THÔNG TIN THÀNH VIÊN
 
-- Họ tên sv 1 - msv
-- Họ tên sv 2 - msv
-- Họ tên sv 3 - msv
-- Họ tên sv 4 - msv
+- Dương Trần Kim Ngân - 21025511
+- Đào Xuần Hoàng Tuấn - 21114651
+- Lâm Quang Phú - 21094601
+- Trương Đức Tài - 21078321
 
 ## TRÁCH NHIỆM
 
