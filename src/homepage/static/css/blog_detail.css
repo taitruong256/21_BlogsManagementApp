@@ -124,11 +124,85 @@ div.container {
 .reply-btn {
     background-color: transparent;
     border: none;
-    color: blue;
+    color: 20B7A5;
     cursor: pointer;
     text-decoration: underline;
 }
 
 .reply-btn:hover {
-    color: darkblue;
+    color: 20B7A5;
+}
+
+.h2{
+    color:#20B7A5;
+}
+
+/* Các nút thêm bình luận, gửi phản hồi, xóa, Delete Blog và Update Blog */
+.comment-form button[type="submit"],
+.reply-btn,
+.delete-btn,
+#delete-blog-button,
+#update-blog-button {
+    background-color: #20B7A5;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.comment-form button[type="submit"]:hover,
+.reply-btn:hover,
+.delete-btn:hover,
+#delete-blog-button:hover,
+#update-blog-button:hover {
+    background-color: #178675;
+}
+
+/* Phần chữ của các nút */
+.comment-form button[type="submit"],
+.reply-btn,
+.delete-btn,
+#delete-blog-button,
+#update-blog-button {
+    font-size: 14px;
+}
+
+/* Điều chỉnh khoảng cách giữa các nút */
+.comment-form button[type="submit"],
+.reply-btn,
+.delete-btn,
+#delete-blog-button,
+#update-blog-button {
+    margin-top: 10px;
+}
+
+/* Định dạng nút xóa và nút cập nhật */
+#delete-blog-button,
+#update-blog-button {
+    display: block;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* Nút phản hồi và xóa */
+.reply-btn,
+.delete-btn {
+    font-size: 0.8em;
+    padding: 5px;
+    background-color: #178675; /* Đặt màu nền */
+    color: white;
+    border: none; /* Bỏ viền */
+    cursor: pointer;
+    text-decoration: none; /* Bỏ dấu gạch chân */
+    border-radius: 5px; /* Bo tròn góc */
+}
+
+/* Hiệu ứng hover cho nút phản hồi và xóa */
+.reply-btn:hover,
+.delete-btn:hover {
+    background-color: #145a50; /* Đổi màu nền khi hover */
 }

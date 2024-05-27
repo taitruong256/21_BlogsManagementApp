@@ -2,10 +2,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     const categorySelect = document.getElementById('category');
     const saveCategoryBtn = document.getElementById('saveCategoryBtn');
 
+    document.getElementById('logout').addEventListener('click', function() {
+        window.location.href = '/logout';  // Thay '/logout' bằng URL logout của bạn
+    });
+
+
     $('#addCategoryButton').click(function() {
         $('#categoryModal').modal('show');
     });
 
+    
     $("#logo").click(function () {
         // Chuyển hướng người dùng đến trang chủ
         window.location.href = "/home"; // Thay đổi URL cho phù hợp với đường dẫn của trang chủ ("/home")
