@@ -46,4 +46,4 @@ Một ứng có thể:
 - Trang chủ hiển thị danh sách các bài viết.
 - Trang chi tiết bài viết hiển thị nội dung bài viết và các bình luận.
 - Trang quản lý tài khoản cá nhân.
-- Trang tạo bài viết bằng các công cụ chỉnh sửa văn bản thân thiện với người dùng
+- Trang tạo và chỉnh sửa bài viết bằng các công cụ chỉnh sửa văn bản thân thiện với người dùng
