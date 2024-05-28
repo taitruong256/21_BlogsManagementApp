@@ -5,6 +5,7 @@
 ### 3.2. ER Diagram
 
 ### 3.3. Database Diagram
+ ![](https://i.imgur.com/xxNuAoS.png)
 
 Sơ đồ trên Hệ quản trị CSDL
 
