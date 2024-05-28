@@ -29,7 +29,7 @@ class Blog(models.Model):
     markdown = RichTextField()
     views = models.PositiveIntegerField(default=0)
     votes = models.PositiveIntegerField(default=0)
-    date_published = models.DateTimeField(auto_now_add=True) 
+    date_published = models.DateTimeField() 
 
     def __str__(self):
         return str(self.blog_id) + ' | ' + self.title
