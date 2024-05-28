@@ -7,4 +7,13 @@ class ProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email')
     class Meta:
         model = Profile
-        fields = ['user_id', 'username', 'email', 'fullname', 'gender', 'birthdate']
+        fields = ['user_id', 'username', 'email', 'fullname', 'gender', 'birthdate', 'profile_picture']
+        
+        
+        
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.ImageField(required=False)
+
+    class Meta:
+        model = Profile
+        fields = ['fullname', 'gender', 'birthdate', 'profile_picture']

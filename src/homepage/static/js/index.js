@@ -1,9 +1,9 @@
 $(document).ready(function () {
-  // Xử lý sự kiện khi người dùng click vào logo
-  $("#logo").click(function () {
-    // Chuyển hướng người dùng đến trang chủ
-    window.location.href = "/home"; // Thay đổi URL cho phù hợp với đường dẫn của trang chủ ("/home")
-});
+//   // Xử lý sự kiện khi người dùng click vào logo
+//   $("#logo").click(function () {
+//     // Chuyển hướng người dùng đến trang chủ
+//     window.location.href = "/home"; // Thay đổi URL cho phù hợp với đường dẫn của trang chủ ("/home")
+// });
 
   // URL API bạn muốn tải
   // const apiUrl = "https://your-api-url.com";

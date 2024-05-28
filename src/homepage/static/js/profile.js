@@ -7,16 +7,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const addBlogButton = document.querySelector('a[href="/home/add-blog/"]');
     const notificationButton = document.querySelector('#notificationButton');
     let isFollowing = false;
+    const profileUrl = `/home/profile/${userId}/`;
     let followingList = []; // Khởi tạo danh sách người đang theo dõi
-
-
-    document.getElementById('logout').addEventListener('click', function() {
-        window.location.href = '/logout';  // Thay '/logout' bằng URL logout của bạn
-    });
-    
+    const postsPerPage = 4; // Số bài viết mỗi trang
+    let currentPage = 1;
+    let allPosts = [];
 
     if (myId !== userId) {
         $('#follow-button').removeClass('d-none');
+        $('#editProfileButton').addClass('d-none');
     }
 
     // Khi click vào logo thì quay về trang chủ 
@@ -25,13 +24,11 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = "/home"; // Thay đổi URL cho phù hợp với đường dẫn của trang chủ ("/home")
     });
 
-
     // Lấy user_id từ URL
     function getUrlSegments() {
         const pathSegments = window.location.pathname.split("/").filter(segment => segment !== '');
-        return  pathSegments[pathSegments.length - 1]
+        return pathSegments[pathSegments.length - 1];
     }
-
 
     // Cập nhật trạng thái của nút "Theo dõi"
     function updateFollowButton() {
@@ -44,7 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
             notificationButton.style.display = 'none';
         }
     }
-
 
     // Thêm hàm để lấy danh sách những người đang theo dõi
     function getFollowingList() {
@@ -65,7 +61,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log(isFollowing);
                 followButton.text(isFollowing ? 'Hủy theo dõi' : 'Theo dõi');
                 updateFollowButton();
-
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 console.error('Error fetching following list:', textStatus, errorThrown);
@@ -73,7 +68,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     getFollowingList();
-
 
     // Hàm để lấy CSRF token từ cookie
     function getCSRFToken() {
@@ -91,14 +85,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return cookieValue;
     }
 
-
     // Hàm để lấy JWT Token từ cookie 
     function getCookie(name) {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
         if (parts.length === 2) return parts.pop().split(';').shift();
     }
-
 
     // Xử lý sự kiện Theo dõi/Hủy theo dõi
     followButton.on('click', function() {
@@ -112,8 +104,8 @@ document.addEventListener('DOMContentLoaded', function() {
             type: type,
             dataType: 'json',
             data: {
-                    id_user_to: userId 
-                },
+                id_user_to: userId 
+            },
             headers: {
                 'Authorization': 'Bearer ' + jwtToken,
                 'X-CSRFToken': getCSRFToken() // Thêm CSRF token nếu cần thiết
@@ -131,163 +123,93 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
- 
 
     // Hàm để gọi api/user/user_id load thông tin người dùng 
     fetch(`/api/user/${userId}/`)
         .then(response => response.json())
         .then(data => {
-            document.getElementById('username').textContent = data.username;
+            document.getElementById('username').textContent = "NickName: " + data.username;
             document.getElementById('fullname').textContent = data.fullname;
-            document.getElementById('email').textContent = data.email;
             document.getElementById('gender').textContent = data.gender === 'male' ? 'Male' : 'Female';
             document.getElementById('birthdate').textContent = data.birthdate;
+             // Cập nhật hình ảnh
+            if (data.profile_picture) {
+                document.getElementById('profilePicture').src = data.profile_picture;
+            }
         })
         .catch(error => console.error('Error fetching profile:', error));
 
-
     // Xử lý sự kiện khi nhấn nút "Following"
-    $('#followingModal').on('show.bs.modal', function() {
-        // Gọi API để lấy danh sách người đang theo dõi
-        $.ajax({
-            url: `/api/friend/following/${userId}`,
-            type: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                // Hiển thị danh sách trong modal
-                displayFollowingList(response);
-                console.log(response);
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.error('Error fetching following list:', textStatus, errorThrown);
-            }
-        });
-    });
-
-    // Xử lý sự kiện khi nhấn nút "Follower"
-    $('#followerModal').on('show.bs.modal', function() {
-        // Gọi API để lấy danh sách người theo dõi
-        $.ajax({
-            url: `/api/friend/follower/${userId}/`,
-            type: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                // Hiển thị danh sách trong modal
-                displayFollowerList(response);
-                console.log(response);
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.error('Error fetching follower list:', textStatus, errorThrown);
-            }
-        });
-    });
-
-    // Hiển thị danh sách người đang theo dõi trong modal "Following"
-    function displayFollowingList(data) {
-        var list = $('#followingList');
-        list.empty(); // Xóa danh sách cũ trước khi thêm mới
-
-        // Thêm mỗi người theo dõi vào danh sách
-        data.forEach(function(user) {
-            var listItem = $('<li>').text(user.userfrom);
-            list.append(listItem);
-        });
-    }
-
-    // Hiển thị danh sách người theo dõi trong modal "Follower"
-    function displayFollowerList(data) {
-        var list = $('#followerList');
-        list.empty(); // Xóa danh sách cũ trước khi thêm mới
-
-        // Thêm mỗi người theo dõi vào danh sách
-        data.forEach(function(user) {
-            var listItem = $('<li>').text(user.userfrom);
-            list.append(listItem);
-        });
-    }
-
-    $('#followingModal').on('show.bs.modal', function() {
-        // Fetch following list from API
-        const userId = $('#my-id').data('my-id');
-        $.ajax({
-            url: `/api/friend/following/${userId}/`,
-            type: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                // Display following list in modal
-                displayFollowingList(response);
-                console.log(response);
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.error('Error fetching following list:', textStatus, errorThrown);
-            }
-        });
-    });
-    
-    
-    // Function to display following list in modal
-    function displayFollowingList(data) {
-        var list = $('#followingList');
-        list.empty(); // Clear previous list items
-    
-        // Append each following user to the list
-        data.forEach(function(user) {
-            var listItem = $('<li>').text(user.user_to.username);
-            list.append(listItem);
-        });
-    }
-
-    // Xử lý sự kiện khi nhấn nút "Follower"
-    $('#followerModal').on('show.bs.modal', function() {
-        // Fetch follower list from API
-        const userId = $('#my-id').data('my-id');
-        $.ajax({
-            url: `/api/friend/follower/${userId}/`,
-            type: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                // Display follower list in modal
-                displayFollowerList(response);
-                console.log(response);
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.error('Error fetching follower list:', textStatus, errorThrown);
-            }
-        });
-    });
-
-    // Function to display follower list in modal
-    function displayFollowerList(data) {
-        var list = $('#followerList');
-        list.empty(); // Clear previous list items
-
-        // Append each follower to the list
-        data.forEach(function(user) {
-            var listItem = $('<li>').text(user.user_from.username);
-            list.append(listItem);
-        });
-    }
-
     $('#followingButton').click(function() {
         $('#followingModal').modal('show');
     });
 
+    // Xử lý sự kiện khi nhấn nút "Follower"
+    $('#followerButton').click(function() {
+        $('#followerModal').modal('show');
+    });
 
-    // Function to display follower list in modal
-    function displayFollowerList(data) {
-        var list = $('#followerList');
-        list.empty(); // Clear previous list items
+    // Gọi API và hiển thị danh sách người theo dõi hoặc người đang theo dõi
+    function fetchAndDisplayList(url, listElementId, displayFunction) {
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                displayFunction(response, listElementId);
+                console.log(response);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('Error fetching list:', textStatus, errorThrown);
+            }
+        });
+    }
 
-        // Append each follower to the list
+    // Hiển thị danh sách người trong modal
+    function displayList(data, listElementId, userKey) {
+        var list = $(listElementId);
+        list.empty(); // Xóa danh sách cũ trước khi thêm mới
+
+        // Thêm mỗi người vào danh sách
         data.forEach(function(user) {
-            var listItem = $('<li>').text(user.user_from.username);
+            var listItem = $('<li>').text(user[userKey].username);
             list.append(listItem);
         });
     }
 
-    $('#followingButton').click(function() {
-        $('#followingModal').modal('show');
+    // Xử lý sự kiện hiển thị modal "Following"
+    $('#followingModal').on('show.bs.modal', function() {
+        fetchAndDisplayList(`/api/friend/following/${userId}/`, '#followingList', function(data, listElementId) {
+            displayList(data, listElementId, 'user_to');
+        });
     });
+
+    // Xử lý sự kiện hiển thị modal "Follower"
+    $('#followerModal').on('show.bs.modal', function() {
+        fetchAndDisplayList(`/api/friend/follower/${userId}/`, '#followerList', function(data, listElementId) {
+            displayList(data, listElementId, 'user_from');
+        });
+    });
+
+    // Function to update follower count
+    function updateFollowCount(userKey, val) {
+        $.ajax({
+            url: `/api/friend/${userKey}/${userId}/`,
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                $(`#${userKey}Button`).text(val + ": " + response.length);
+                console.log('Follower count updated:', response.length);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('Error fetching follower count:', textStatus, errorThrown);
+            }
+        });
+    }
+
+    // Update follower count on page load
+    updateFollowCount("following", "Đang theo dõi");
+    updateFollowCount("follower", "Đã theo dõi");
 
     // Hàm để gọi API và hiển thị danh sách thông báo
     function loadNotifications() {
@@ -324,4 +246,182 @@ document.addEventListener('DOMContentLoaded', function() {
     $('#notificationModal').on('show.bs.modal', function() {
         loadNotifications();
     });
+
+    // Hàm để hiển thị các bài viết trên một trang cụ thể
+    function displayPosts(page) {
+        const startIndex = (page - 1) * postsPerPage;
+        const endIndex = page * postsPerPage;
+        const postsToShow = allPosts.slice(startIndex, endIndex);
+
+        const blogListContainer = document.getElementById('blog-list');
+        blogListContainer.innerHTML = '';
+
+        postsToShow.forEach(blogHtml => {
+            blogListContainer.innerHTML += blogHtml;
+        });
+
+        // Cập nhật các nút phân trang
+        updatePagination(page);
+    }
+
+    // Hàm để cập nhật các nút phân trang
+    function updatePagination(page) {
+        const totalPages = Math.ceil(allPosts.length / postsPerPage);
+        const paginationContainer = document.getElementById('pagination');
+        paginationContainer.innerHTML = '';
+
+        // Nút Previous
+        const prevItem = document.createElement('li');
+        prevItem.className = `page-item ${page === 1 ? 'disabled' : ''}`;
+        const prevLink = document.createElement('a');
+        prevLink.className = 'page-link';
+        prevLink.href = '#';
+        prevLink.textContent = 'Previous';
+        prevLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (page > 1) {
+                displayPosts(page - 1);
+            }
+        });
+        prevItem.appendChild(prevLink);
+        paginationContainer.appendChild(prevItem);
+
+        // Các nút trang
+        for (let i = 1; i <= totalPages; i++) {
+            const pageItem = document.createElement('li');
+            pageItem.className = `page-item ${i === page ? 'active' : ''}`;
+            const pageLink = document.createElement('a');
+            pageLink.className = 'page-link';
+            pageLink.href = '#';
+            pageLink.textContent = i;
+            pageLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                displayPosts(i);
+            });
+            pageItem.appendChild(pageLink);
+            paginationContainer.appendChild(pageItem);
+        }
+
+        // Nút Next
+        const nextItem = document.createElement('li');
+        nextItem.className = `page-item ${page === totalPages ? 'disabled' : ''}`;
+        const nextLink = document.createElement('a');
+        nextLink.className = 'page-link';
+        nextLink.href = '#';
+        nextLink.textContent = 'Next';
+        nextLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (page < totalPages) {
+                displayPosts(page + 1);
+            }
+        });
+        nextItem.appendChild(nextLink);
+        paginationContainer.appendChild(nextItem);
+    }
+
+    // Gọi API để lấy danh sách các bài viết
+    fetch(`/api/blog/list/${userId}/`)
+    .then(response => response.json())
+    .then(data => {
+        data.forEach(category => {
+            category.list_blog.forEach(blog => {
+                const blogHtml = `
+                    <div class="post col-6">
+                        <img
+                            src="${blog.img}"
+                            alt="Post Picture"
+                            style="width: 100%; height: 100px"
+                        />
+                        <div class="content text-italic">
+                            <p>
+                                <span class="title text-bold-500">Author:</span>
+                                <span class="content">${blog.author}</span>
+                            </p>
+                            <p>
+                                <span class="title text-bold-500">Title:</span>
+                                <span class="content">${blog.title}</span>
+                            </p>
+                            <p>
+                                <span class="title text-bold-500">Category:</span>
+                                <span class="content">${category.category}</span>
+                            </p>
+                            <p>
+                                <span class="title text-bold-500">Rank:</span>
+                                <span class="content">${blog.rank}</span>
+                            </p>
+                        </div>
+                    </div>
+                `;
+                allPosts.push(blogHtml);
+            });
+        });
+
+        // Hiển thị trang đầu tiên
+        displayPosts(currentPage);
+    })
+    .catch(error => console.error('Error fetching data:', error));
+
+
+    const spinner = document.getElementById('spinner');
+
+    $('#editProfileButton').click(function() {
+        const fullname = $('#fullname').text();
+        const gender = $('#gender').text() === 'Nam' ? 'male' : 'female';
+        const birthdate = $('#birthdate').text();
+        
+        $('#editFullname').val(fullname);
+        $('#editGender').val(gender);
+        $('#editBirthdate').val(birthdate);
+
+        $('#editProfileModal').modal('show');
+    });
+
+    $('#saveProfileButton').click(function() {
+        const fullname = $('#editFullname').val();
+        const gender = $('#editGender').val();
+        const birthdate = $('#editBirthdate').val();
+        const formData = new FormData();
+        formData.append('fullname', fullname);
+        formData.append('gender', gender);
+        formData.append('birthdate', birthdate);
+        if ($('#editProfilePicture')[0].files[0]) {
+            formData.append('profile_picture', $('#editProfilePicture')[0].files[0]);
+        }
+
+        if (!gender) {
+            alert('Vui lòng chọn giới tính.');
+            return;
+        }
+
+        console.log('Saving profile data:', ...formData);  // Log dữ liệu FormData để kiểm tra
+
+        // Hiển thị spinner
+        spinner.style.display = 'block';
+
+        $.ajax({
+            url: `/home/profile/${userId}/update/`,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
+            },
+            success: function(response) {
+                console.log('Profile updated successfully:', response);  // Log dữ liệu sau khi cập nhật thành công
+                spinner.style.display = 'none';  // Ẩn spinner
+                window.location.reload();  // Tải lại toàn bộ trang sau khi cập nhật thành công
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('Error updating profile:', textStatus, errorThrown);
+                spinner.style.display = 'none';  // Ẩn spinner khi gặp lỗi
+                alert('Đã xảy ra lỗi khi cập nhật thông tin. Vui lòng thử lại sau.');
+            }
+        });
+    });
+
+    function getUrlSegments() {
+        const pathSegments = window.location.pathname.split("/").filter(segment => segment !== '');
+        return pathSegments[pathSegments.length - 1];
+    }
 });

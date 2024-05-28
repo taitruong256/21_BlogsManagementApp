@@ -1,7 +1,9 @@
-from django.urls import include, reverse_lazy, path
-from .views import RegisterView
+# profiles/urls.py
+
+from django.urls import path
+from .views import update_profile, RegisterView
 
 urlpatterns = [
+    path('<int:user_id>/update/', update_profile, name='update_profile'),
     path('register/', RegisterView.as_view(), name='register'),
-    # Các URL khác của bạn ở đây
 ]

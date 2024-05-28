@@ -24,6 +24,12 @@ class BlogList(generics.ListCreateAPIView):
         Only blogs with date_published before the current time are returned.
         """
         search_query = self.request.query_params.get('search', None)
+        user_id = self.kwargs.get('user_id', None)
+        
+        if user_id:
+            profile = Profile.objects.get(user_id=user_id)
+            return Blog.objects.filter(user=profile).order_by('-date_published')
+        
         current_time = timezone.now()
         
         if search_query:
